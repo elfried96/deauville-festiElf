@@ -77,3 +77,36 @@ block starts where the previous one ended.
    ```
 
 Then [step 00](B1/E00_start.md) creates your project, in its own folder.
+
+##########################
+
+## Step 07 — First classes
+
+### 1. Venue
+
+The `Venue` class represents a festival venue.
+
+- **Attributes:** `slug`, `name`, `capacity`, `address`.
+- **Computed information:** the venue's identifying slug can be derived from its name when the source data does not provide one.
+- **Purpose:** store venue information and make it available to performances and API responses.
+
+### 2. Artist
+
+The `Artist` class represents a festival artist.
+
+- **Attributes:** `slug`, `name`, `bio`, `photo_url`.
+- **Computed information:** the artist's performances can be retrieved from the festival data.
+- **Purpose:** store artist information and provide the list of their performances.
+
+### 3. Performance
+
+The `Performance` class represents a festival event, including solo shows, lineups and workshops.
+
+- **Attributes:** `id`, `kind`, `title`, `venue`, `start`, `duration_minutes`, `description`, and the optional fields specific to each kind.
+- **Properties:** `end`, `festival_day`, `venue_name`, and other derived information.
+- **Methods:** `involves(artist)` checks whether an artist participates in a performance; `to_view()` prepares the performance data for the API.
+- **Purpose:** centralize the calculations and information associated with a performance.
+
+### Loading the festival
+
+A single loading function reads `data/festival.json` and builds the `Venue`, `Artist` and `Performance` objects. The command-line interface and the FastAPI routes use these objects instead of manipulating the original JSON dictionaries directly.
