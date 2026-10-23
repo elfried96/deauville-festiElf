@@ -30,6 +30,8 @@ def slugify(text: str) -> str:
 
 @dataclass
 class Venue:
+    """Un lieu du festival ; son slug vient de son nom."""
+
     name: str
     capacity: int
     address: str
@@ -56,6 +58,8 @@ class Venue:
 
 @dataclass(eq=False)
 class Artist:
+    """Un artiste ; deux artistes au même slug sont le même artiste."""
+
     name: str
     bio: str = ""
     photo_url: str = ""
@@ -219,14 +223,16 @@ class Performance(ABC):
 
 
 class SoloShow(Performance):
+    """Un seul artiste sur scène, avec un âge minimum facultatif."""
+
     kind = "solo"
 
     def __init__(
         self,
-        *args,
+        *args: Any,
         artist: str,
         min_age: int | None = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -274,14 +280,16 @@ class SoloShow(Performance):
 
 
 class Lineup(Performance):
+    """Un plateau : un animateur et au moins deux numéros."""
+
     kind = "lineup"
 
     def __init__(
         self,
-        *args,
+        *args: Any,
         host: str,
         acts: list[str],
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -356,24 +364,33 @@ class Lineup(Performance):
 
 
 class Workshop(Performance):
+    """Un atelier : un professeur et des participants inscrits."""
+
     kind = "workshop"
 
     def __init__(
         self,
-        *args,
+        *args: Any,
         teacher: str,
         max_participants: int,
         participants: list[str] | None = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
 
         if max_participants < 1:
             raise FestivalValidationError("A workshop must have at least one place.")
 
+        participants = list(participants or [])
+        if len(participants) > max_participants:
+            raise FestivalValidationError(
+                f"{len(participants)} participants are registered: "
+                f"max_participants cannot be lower."
+            )
+
         self.teacher = teacher
         self.max_participants = max_participants
-        self._participants = list(participants or [])
+        self._participants = participants
 
     @classmethod
     def kind_fields(cls, data: dict[str, Any]) -> dict[str, Any]:

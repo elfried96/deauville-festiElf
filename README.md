@@ -1,112 +1,191 @@
-# Object-Oriented Programming in Python - the project track
+# Deauville Festival du Rire — le programme
 
-ECE Paris - 2026-2027
+Le programme du **Deauville Festival du Rire** (10-13 juin 2027) en Python :
+des classes pour les lieux, les artistes et les performances, une ligne de
+commande, et une API JSON (FastAPI) qui sert le site public et l'admin des
+organisateurs. Toutes les règles du festival sont vérifiées au même endroit,
+et chaque refus est un message clair.
 
-You learn Python by building one project, from the first line to a web
-platform: the programme of the **Deauville Festival du Rire** (10-13 June
-2027). The website is given; behind it, everything is yours. Each step adds
-one thing that works, and brings the notion that makes it possible.
+Projet du cours de programmation orientée objet, ECE Paris 2026-2027. Les
+fiches du cours sont dans `B1/` à `B5/` (voir [COURSE.md](COURSE.md)) ; le
+contrat de l'API est [API.md](API.md).
 
-This repository holds the **sheets** of the steps and small **side examples**
-on other subjects (a library, buses, a bank…). They show a technique; your
-project is where you use it. Your code lives in **your own repository**,
-started from the starter at step 00.
+## Installer
 
-A second repository, the **practice repository**, holds more examples
-(notebooks) and exercises with tests for each block. It is optional: use it
-when a notion needs more practice. Each sheet ends with the matching part.
+Il faut [uv](https://docs.astral.sh/uv/).
 
-## The steps
+```bash
+git clone https://github.com/elfried96/deauville-festiElf.git
+cd deauville-festiElf
+uv sync
+```
 
-| Block | Step                                                       | At the end of the step                                       |
-| ----- | ---------------------------------------------------------- | ------------------------------------------------------------ |
-| B1    | [00 Start](B1/E00_start.md)                                | the project runs and prints a summary of the festival        |
-|       | [01 Explore](B1/E01_explore.md)                            | six questions about the data, answered by loops              |
-|       | [02 The programme of a day](B1/E02_ask_a_day.md)           | the user asks for a day, gets its programme (with a bug)     |
-| B2    | [03 Functions and commands](B2/E03_functions.md)           | `main.py programme 2027-06-11`, on GitHub                    |
-|       | [04 Real dates and times](B2/E04_time.md)                  | the night belongs to the right day; what is on stage now     |
-|       | [05 Rules, errors and saving](B2/E05_errors_and_saving.md) | adding a show checks the rules and saves the file            |
-| B3    | [06 The website lights up](B3/E06_first_routes.md)         | a server; the website shows days, venues, artists            |
-|       | [07 The first classes](B3/E07_classes.md)                  | the programme and the artist pages appear                    |
-|       | [08 The festival object](B3/E08_festival_object.md)        | "on stage now" appears; tests prove every rule               |
-| B4    | [09 Three kinds](B4/E09_three_kinds.md)                    | solo shows, lineups, workshops: one family, no `if kind ==`  |
-|       | [10 The admin](B4/E10_admin.md)                            | organisers schedule, move, cancel; nobody bypasses the rules |
-|       | [11 A real package](B4/E11_package.md)                     | `uv run deauville serve`, `uv build`                         |
-| B5    | [12 The whole contract](B5/E12_full_contract.md)           | all of `API.md`, tested                                      |
-|       | [13 Ship it](B5/E13_ship.md)                               | a fresh clone runs; your README explains your structure      |
+## Lancer
 
-Each block README lists its steps and side examples: [B1](B1/README.md),
-[B2](B2/README.md), [B3](B3/README.md), [B4](B4/README.md),
-[B5](B5/README.md).
+### La ligne de commande
 
-## How a step works
+```bash
+uv run deauville                              # résumé du festival
+uv run deauville venues                       # les lieux et leurs places
+uv run deauville programme 2027-06-11         # le programme d'une journée
+uv run deauville artist max-pellerin          # les passages d'un artiste, avec son rôle
+uv run deauville now 2027-06-11T21:00         # sur scène à ce moment, et la suite
+uv run deauville stats                        # les questions de l'étape 01
+uv run deauville add                          # ajouter un solo (questions posées)
+uv run deauville cancel le-kiosque-2027-06-12-0100
+```
 
-Each sheet has the same parts:
+Chaque commande accepte `--data FICHIER` pour travailler sur un autre fichier
+de données que `data/festival.json`.
 
-- **At the end**: what works when the step is done, seen from outside (an
-  output in the terminal, a page of the website).
-- **Why now**: what the previous version cannot do. The notion of the step
-  answers it.
-- **Learn**: the notion, short, and the side examples.
-- **Do**: what to build. It says _what_ must work, never _which_ functions or
-  classes to write: the structure of your project is your work, and you
-  defend it at the oral.
-- **Check**: the exact output, or what the website must show. No tests are
-  given: from step 08, you write your own.
+### Le serveur
 
-Steps not finished in class are finished at home before the next block: each
-block starts where the previous one ended.
+```bash
+uv run deauville serve                        # http://127.0.0.1:8000
+uv run deauville serve --data copie.json --port 8001
+```
 
-## Setup
+- le site : <http://127.0.0.1:8000/>
+- l'admin : <http://127.0.0.1:8000/admin/>
+- la documentation interactive de l'API : <http://127.0.0.1:8000/docs>
 
-1. Install uv:
-   - macOS / Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh`
-   - Windows (PowerShell):
-     `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+### Les tests et les outils
 
-   Close the terminal, open a new one, check with `uv --version`.
+```bash
+uv run pytest -v          # tous les tests (ils ne touchent jamais data/festival.json)
+uv run ruff check .       # le style
+uv run ruff format .      # la mise en forme
+uv build                  # dist/deauville-0.1.0-py3-none-any.whl
+```
 
-2. Install VS Code with the extensions _Python_ (Microsoft) and _Ruff_
-   (Astral). Keep your folders outside OneDrive.
-3. Open this folder in VS Code, then a terminal (`Terminal > New Terminal`),
-   and run `uv sync`.
-4. Side examples run from this folder:
+## Structure
 
-   ```bash
-   uv run python B1/side/e00_playlist.py
-   ```
+```
+src/deauville/
+├── errors.py     la famille d'erreurs du festival
+├── storage.py    Storage (interface), JSONStorage, MemoryStorage
+├── models.py     Venue, Artist, Performance et ses trois sous-classes
+├── festival.py   Festival : les collections et les règles ; load/save
+├── api.py        create_app(storage) : les routes d'API.md, le site, l'admin
+└── cli.py        main() : la commande `deauville`
+tests/
+├── test_festival.py   les règles, directement sur les objets
+└── test_api.py        tout API.md par HTTP (TestClient), sans serveur
+```
 
-Then [step 00](B1/E00_start.md) creates your project, in its own folder.
+Chaque module ne dépend que de ceux du dessus de la liste : `errors` ne
+dépend de rien, `api` et `cli` sont tout en bas et ne contiennent aucune
+règle.
 
-##########################
+### Les classes, et pourquoi
 
-## Step 07 — First classes
+- **`Venue`, `Artist`** (dataclasses) : des données simples. Le slug est une
+  propriété calculée à partir du nom, il ne peut donc pas être faux. Deux
+  artistes au même slug sont égaux (`Zoé Tanguy` = `zoe tanguy`).
+- **`Performance`** (classe abstraite) : ce qui est commun à toutes les
+  performances (horaires, `end`, `festival_day` — une journée finit à 06:00,
+  l'ordre du programme, la vue JSON). Ses méthodes abstraites —
+  `artist_slugs()`, `role_of()`, `summary()`, `kind_fields()` — obligent
+  chaque type à dire ce qui lui est propre.
+- **`SoloShow`, `Lineup`, `Workshop`** héritent de `Performance` et
+  appellent `super().__init__()`. Chacune vérifie ses propres règles à la
+  construction (âge 0-18 ; au moins deux numéros, sans doublon, animateur
+  hors des numéros, durée minimale ; au moins une place). Grâce au
+  polymorphisme, le reste du code n'écrit jamais `if kind == ...` : la table
+  `PERFORMANCE_CLASSES` et `performance_from_data()` choisissent la classe,
+  puis on appelle simplement `performance.summary()`,
+  `performance.artist_slugs()`…
+- **`Festival`** garde ses collections privées (`_venues`, `_artists`,
+  `_performances`). On les lit par des propriétés qui renvoient une **copie**,
+  et on les change seulement par des méthodes qui vérifient les règles :
+  `add_artist`, `add_performance`, `replace_performance`,
+  `cancel_performance`, `register_participant`. De même, les numéros d'un
+  plateau et les participants d'un atelier ne changent pas de l'extérieur.
+- **`Storage`** (interface abstraite `load()` / `save()`) : le festival ne
+  sait pas où il est stocké. `JSONStorage` lit et écrit le fichier,
+  `MemoryStorage` garde les données en mémoire pour les tests.
 
-### 1. Venue
+### Où vivent les règles
 
-The `Venue` class represents a festival venue.
+Dans les objets, jamais dans les routes ni dans la ligne de commande :
 
-- **Attributes:** `slug`, `name`, `capacity`, `address`.
-- **Computed information:** the venue's identifying slug can be derived from its name when the source data does not provide one.
-- **Purpose:** store venue information and make it available to performances and API responses.
+| Règle                                                        | Où                                   |
+| ------------------------------------------------------------ | ------------------------------------ |
+| durée de 1 à 360 minutes, titre non vide                     | `Performance.__init__`               |
+| règles propres à un solo, un plateau, un atelier             | `__init__` de chaque sous-classe     |
+| lieu et artistes connus, jour du festival, 30 min d'écart entre deux performances d'un même lieu ou d'un même artiste, pas deux fois le même id | `Festival.validate_performance` |
+| un déplacement refusé ne change rien                         | `Festival.replace_performance`       |
+| inscription : pas deux fois le même nom, pas au-delà des places, seulement un atelier | `Workshop.register` (et `Performance.register`, qui refuse) |
+| un artiste n'existe qu'une fois                              | `Festival.add_artist`                |
 
-### 2. Artist
+L'API et la ligne de commande construisent les objets et appellent ces
+méthodes : elles ne peuvent pas contourner les règles.
 
-The `Artist` class represents a festival artist.
+### Comment une erreur dit quelle règle
 
-- **Attributes:** `slug`, `name`, `bio`, `photo_url`.
-- **Computed information:** the artist's performances can be retrieved from the festival data.
-- **Purpose:** store artist information and provide the list of their performances.
+Toutes les erreurs du festival héritent de `FestivalError`. Le **type** dit
+ce qui ne va pas, le **message** dit quelle règle, en une phrase :
 
-### 3. Performance
+| Exception                 | Sens                     | HTTP |
+| ------------------------- | ------------------------ | ---- |
+| `FestivalNotFoundError`   | lieu, artiste, performance inconnu | 404 |
+| `FestivalConflictError`   | lieu ou artiste occupé, hors festival, atelier complet, déjà existant | 409 |
+| `FestivalValidationError` | valeur invalide          | 422  |
+| `FestivalStorageError`    | fichier illisible ou impossible à écrire | 500 |
 
-The `Performance` class represents a festival event, including solo shows, lineups and workshops.
+Dans l'API, un seul gestionnaire (`@app.exception_handler(FestivalError)`)
+traduit le type en code HTTP : les routes n'écrivent jamais `try`. La ligne
+de commande attrape toute la famille avec `except FestivalError` et affiche
+le message. Un corps ou un paramètre de mauvaise forme est refusé avant
+par FastAPI et pydantic (422, avec une liste de problèmes).
 
-- **Attributes:** `id`, `kind`, `title`, `venue`, `start`, `duration_minutes`, `description`, and the optional fields specific to each kind.
-- **Properties:** `end`, `festival_day`, `venue_name`, and other derived information.
-- **Methods:** `involves(artist)` checks whether an artist participates in a performance; `to_view()` prepares the performance data for the API.
-- **Purpose:** centralize the calculations and information associated with a performance.
+### Une route, de l'URL à la règle
 
-### Loading the festival
+`POST /api/performances` avec un solo de Nora Lebrun au Kiosque à 11:30,
+alors qu'elle y joue déjà à 11:00 :
 
-A single loading function reads `data/festival.json` and builds the `Venue`, `Artist` and `Performance` objects. The command-line interface and the FastAPI routes use these objects instead of manipulating the original JSON dictionaries directly.
+1. FastAPI vérifie la forme du corps avec `PerformanceBody` (pydantic).
+2. `create_performance` charge le festival depuis le stockage.
+3. `performance_from_data()` choisit `SoloShow` dans `PERFORMANCE_CLASSES`
+   et la construit : l'id `le-kiosque-2027-06-13-1130` est calculé.
+4. `Festival.add_performance` → `validate_performance` trouve un
+   chevauchement au même lieu et lève `FestivalConflictError("Le Kiosque is
+   already booked for …")`.
+5. Le gestionnaire d'erreurs répond `409 {"detail": "Le Kiosque is already
+   booked for …"}`. Rien n'a été enregistré.
+
+### Avec une base de données
+
+Il suffirait d'écrire une nouvelle classe, par exemple `SQLiteStorage(Storage)`,
+avec ses propres `load()` et `save()`, et de la choisir dans `cli.py` (une
+option `--db`). `create_app(storage)` la reçoit comme les autres : aucune
+classe du festival ni aucune route ne change. Pour une vraie base, on
+voudrait ensuite ne pas tout recharger et tout réécrire à chaque requête,
+mais lire et modifier une seule ligne : l'interface `Storage` grandirait
+(`add_performance`, `delete_performance`…).
+
+## Ce qui est fait, ce qui ne l'est pas
+
+Fait (étapes 00 à 13) :
+
+- toutes les commandes de la ligne de commande, avec `--data` et `--port` ;
+- tout `API.md` : lecture, écriture (admin), erreurs ;
+- le site et l'admin servis par le même serveur ;
+- 75 tests (règles et API), `ruff` propre, annotations et docstrings,
+  `uv build`.
+
+Pas fait :
+
+- l'extension SQLite ;
+- `deauville add` n'ajoute que des solos (plateaux et ateliers passent par
+  l'admin).
+
+Limites connues :
+
+- Le fichier de données et le dossier `web/` sont cherchés à côté du code
+  (`uv sync` installe le projet en mode éditable, donc tout marche depuis le
+  dépôt). Installée ailleurs avec la wheel, la commande a besoin de
+  `--data`, et le site ne serait pas trouvé.
+- Chaque requête recharge et réécrit tout le fichier, sans verrou : deux
+  écritures exactement simultanées, la dernière gagne.
+- `/api/now` sans `?at=` utilise l'heure de la machine, sans fuseau horaire.

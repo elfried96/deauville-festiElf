@@ -196,12 +196,15 @@ def main(argv: list[str] | None = None) -> None:
     args = list(sys.argv[1:] if argv is None else argv)
 
     data_file = take_option(args, "--data")
-    port_text = take_option(args, "--port")
+    port_text = take_option(args, "--port") or "8000"
+    if not port_text.isdigit():
+        print(f"Error: '{port_text}' is not a port number.")
+        sys.exit(2)
     storage = JSONStorage(data_file or DEFAULT_DATA_FILE)
 
     try:
         if args == ["serve"]:
-            serve(storage, int(port_text or 8000))
+            serve(storage, int(port_text))
             return
 
         festival = load_festival(storage)

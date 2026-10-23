@@ -255,3 +255,17 @@ def test_same_artist_name_twice_is_refused(festival):
 
     with pytest.raises(FestivalConflictError, match="already exists"):
         festival.add_artist(Artist(name="zoe tanguy"))
+
+
+def test_workshop_cannot_have_fewer_places_than_participants():
+    with pytest.raises(FestivalValidationError, match="cannot be lower"):
+        Workshop(
+            identifier="w",
+            title="Atelier",
+            venue="le-kiosque",
+            start=datetime(2027, 6, 11, 10, 0),
+            duration_minutes=60,
+            teacher="karim-benali",
+            max_participants=1,
+            participants=["Lou", "Zoé"],
+        )

@@ -84,16 +84,10 @@
       "name": "Élodie Marchal",
       "bio": "Stand-up about sport, failure and trying again.",
       "photo_url": ""
-    },
-    {
-      "name": "Zoé Tanguy",
-      "bio": "Artiste de test",
-      "photo_url": ""
     }
   ],
   "performances": [
     {
-      "id": "grand-casino-2027-06-10-2030",
       "kind": "lineup",
       "title": "Opening Gala",
       "venue": "grand-casino",
@@ -109,7 +103,6 @@
       ]
     },
     {
-      "id": "theatre-des-planches-2027-06-10-2100",
       "kind": "solo",
       "title": "Family Business",
       "venue": "theatre-des-planches",
@@ -120,7 +113,6 @@
       "min_age": 0
     },
     {
-      "id": "le-kiosque-2027-06-10-2230",
       "kind": "lineup",
       "title": "Open Mic Night",
       "venue": "le-kiosque",
@@ -135,7 +127,6 @@
       ]
     },
     {
-      "id": "la-cabane-2027-06-11-1030",
       "kind": "workshop",
       "title": "Improv for Beginners",
       "venue": "la-cabane",
@@ -151,7 +142,6 @@
       ]
     },
     {
-      "id": "le-kiosque-2027-06-11-1500",
       "kind": "workshop",
       "title": "Writing a Punchline",
       "venue": "le-kiosque",
@@ -165,7 +155,6 @@
       ]
     },
     {
-      "id": "theatre-des-planches-2027-06-11-1800",
       "kind": "solo",
       "title": "Nothing Serious",
       "venue": "theatre-des-planches",
@@ -176,7 +165,6 @@
       "min_age": 0
     },
     {
-      "id": "grand-casino-2027-06-11-2030",
       "kind": "solo",
       "title": "Tall Tales",
       "venue": "grand-casino",
@@ -187,7 +175,6 @@
       "min_age": 0
     },
     {
-      "id": "theatre-des-planches-2027-06-11-2130",
       "kind": "solo",
       "title": "Straight Face",
       "venue": "theatre-des-planches",
@@ -198,7 +185,6 @@
       "min_age": 16
     },
     {
-      "id": "le-kiosque-2027-06-11-2330",
       "kind": "solo",
       "title": "Late Laughs",
       "venue": "le-kiosque",
@@ -209,7 +195,6 @@
       "min_age": 18
     },
     {
-      "id": "le-kiosque-2027-06-12-0100",
       "kind": "lineup",
       "title": "After Hours",
       "venue": "le-kiosque",
@@ -223,7 +208,6 @@
       ]
     },
     {
-      "id": "la-cabane-2027-06-12-1030",
       "kind": "workshop",
       "title": "Stand-up Lab",
       "venue": "la-cabane",
@@ -240,7 +224,6 @@
       ]
     },
     {
-      "id": "theatre-des-planches-2027-06-12-1100",
       "kind": "solo",
       "title": "Brunch & Punchlines",
       "venue": "theatre-des-planches",
@@ -251,7 +234,6 @@
       "min_age": 0
     },
     {
-      "id": "le-kiosque-2027-06-12-1500",
       "kind": "lineup",
       "title": "New Faces",
       "venue": "le-kiosque",
@@ -266,7 +248,6 @@
       ]
     },
     {
-      "id": "grand-casino-2027-06-12-1700",
       "kind": "solo",
       "title": "Family Business",
       "venue": "grand-casino",
@@ -277,7 +258,6 @@
       "min_age": 0
     },
     {
-      "id": "theatre-des-planches-2027-06-12-1830",
       "kind": "solo",
       "title": "Half Past Funny",
       "venue": "theatre-des-planches",
@@ -288,7 +268,6 @@
       "min_age": 0
     },
     {
-      "id": "grand-casino-2027-06-12-2030",
       "kind": "solo",
       "title": "Nothing Serious",
       "venue": "grand-casino",
@@ -299,7 +278,6 @@
       "min_age": 0
     },
     {
-      "id": "theatre-des-planches-2027-06-12-2100",
       "kind": "lineup",
       "title": "Deauville Comedy Club",
       "venue": "theatre-des-planches",
@@ -314,7 +292,6 @@
       ]
     },
     {
-      "id": "le-kiosque-2027-06-12-2330",
       "kind": "solo",
       "title": "Midnight Snack",
       "venue": "le-kiosque",
@@ -325,7 +302,6 @@
       "min_age": 16
     },
     {
-      "id": "la-cabane-2027-06-13-1030",
       "kind": "workshop",
       "title": "Improv for Beginners",
       "venue": "la-cabane",
@@ -337,7 +313,6 @@
       "participants": []
     },
     {
-      "id": "theatre-des-planches-2027-06-13-1100",
       "kind": "solo",
       "title": "Brunch & Punchlines",
       "venue": "theatre-des-planches",
@@ -348,7 +323,6 @@
       "min_age": 0
     },
     {
-      "id": "le-kiosque-2027-06-13-1500",
       "kind": "solo",
       "title": "First Time Here",
       "venue": "le-kiosque",
@@ -359,7 +333,6 @@
       "min_age": 0
     },
     {
-      "id": "theatre-des-planches-2027-06-13-1700",
       "kind": "solo",
       "title": "Tall Tales",
       "venue": "theatre-des-planches",
@@ -370,7 +343,6 @@
       "min_age": 0
     },
     {
-      "id": "grand-casino-2027-06-13-2030",
       "kind": "lineup",
       "title": "Closing Gala",
       "venue": "grand-casino",
@@ -385,17 +357,6 @@
         "max-pellerin",
         "jeanne-aubry"
       ]
-    },
-    {
-      "id": "le-kiosque-2027-06-13-1200",
-      "kind": "solo",
-      "title": "Test API",
-      "venue": "le-kiosque",
-      "start": "2027-06-13T12:00",
-      "duration_minutes": 45,
-      "description": "Test de modification via l API",
-      "artist": "nora-lebrun",
-      "min_age": 0
     }
   ]
 }

@@ -14,7 +14,7 @@ from .errors import (
     FestivalValidationError,
 )
 from .festival import Festival, load_festival, save_festival
-from .models import Artist, performance_from_data
+from .models import Artist, Performance, performance_from_data
 from .storage import PROJECT_ROOT, JSONStorage, Storage
 
 WEB_DIR = PROJECT_ROOT / "web"
@@ -28,6 +28,8 @@ STATUS_CODES = {
 
 
 class ArtistBody(BaseModel):
+    """Le corps de POST /api/artists."""
+
     name: str
     bio: str = ""
     photo_url: str = ""
@@ -53,6 +55,8 @@ class PerformanceBody(BaseModel):
 
 
 class ParticipantBody(BaseModel):
+    """Le corps de POST /api/performances/{id}/participants."""
+
     name: str
 
 
@@ -71,7 +75,7 @@ def create_app(storage: Storage) -> FastAPI:
     def open_festival() -> Festival:
         return load_festival(storage)
 
-    def performance_from_body(body: PerformanceBody):
+    def performance_from_body(body: PerformanceBody) -> Performance:
         return performance_from_data(body.model_dump(mode="json", exclude_none=True))
 
     # --- Lecture ---------------------------------------------------------
