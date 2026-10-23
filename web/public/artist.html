@@ -3,33 +3,60 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Artist - Deauville Festival du Rire</title>
+    <title>Artist — Festival du Rire</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
-    <header class="masthead">
-      <div class="wrap">
-        <p class="eyebrow">Deauville Festival du Rire</p>
-        <div class="artist-head">
-          <div class="avatar big" id="avatar"></div>
-          <h1 id="artist-name">Artist</h1>
-        </div>
-        <nav class="nav">
-          <a href="/">&larr; Programme</a>
-          <a href="/#artists">All artists</a>
-        </nav>
-      </div>
+    <header class="wrap site-header">
+      <a class="brand" href="/">
+        <strong>Festival du Rire</strong>
+        <span>Deauville 2027</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="/#programme">Programme</a>
+        <a href="/#artists" aria-current="page">Artists</a>
+        <a href="/#venues">Venues</a>
+        <a class="button" href="/#programme">See the programme</a>
+      </nav>
     </header>
 
     <main class="wrap">
-      <section>
-        <p id="bio"></p>
-      </section>
-      <section>
-        <h2>On stage</h2>
-        <div class="cards" id="cards"></div>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/#artists">Artists</a> <span aria-hidden="true">/</span>
+        <span aria-current="page" id="crumb"></span>
+      </nav>
+
+      <div class="artist">
+        <div class="photo" id="portrait"></div>
+        <div class="artist-body">
+          <h1 id="artist-name">Artist</h1>
+          <p class="artist-bio" id="bio"></p>
+          <dl class="facts" id="facts"></dl>
+          <h2 class="sub-title">On stage</h2>
+          <ol class="rows" id="shows"></ol>
+        </div>
+      </div>
+
+      <section class="section" aria-labelledby="with-title" id="with-section">
+        <div class="section-head">
+          <h2 class="section-title" id="with-title">On stage together</h2>
+          <a href="/#artists">All artists</a>
+        </div>
+        <div class="grid" id="with-grid"></div>
       </section>
     </main>
+
+    <footer class="wrap site-footer">
+      <div class="footer-line">
+        <span>Festival du Rire · Deauville</span>
+        <span><a href="/admin/">Organisers</a> · <a href="/docs">API</a></span>
+      </div>
+    </footer>
 
     <script src="/app.js"></script>
     <script>

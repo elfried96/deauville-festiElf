@@ -3,50 +3,95 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Deauville Festival du Rire</title>
+    <title>Festival du Rire — Deauville 2027</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
-    <header class="masthead">
-      <div class="wrap">
-        <p class="eyebrow">First edition</p>
-        <h1>Deauville Festival <span>du Rire</span></h1>
-        <p class="dates" id="dates"></p>
-        <nav class="nav">
-          <a href="#programme">Programme</a>
-          <a href="#artists">Artists</a>
-          <a href="/admin/">Admin</a>
-          <a href="/docs">API</a>
-        </nav>
-      </div>
+    <header class="wrap site-header">
+      <a class="brand" href="/">
+        <strong>Festival du Rire</strong>
+        <span>Deauville 2027</span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="#programme">Programme</a>
+        <a href="#artists">Artists</a>
+        <a href="#venues">Venues</a>
+        <a class="button" href="#programme">See the programme</a>
+      </nav>
     </header>
 
-    <main class="wrap">
-      <section id="now-section">
-        <div class="now" id="now"></div>
-      </section>
-
-      <section id="programme">
-        <h2>Programme</h2>
-        <div class="toolbar" id="days"></div>
-        <div class="toolbar">
-          <span class="muted" id="count"></span>
-          <select id="venue-filter" aria-label="Venue">
-            <option value="">All venues</option>
-          </select>
+    <div class="wrap">
+      <section class="hero" aria-label="Festival">
+        <span class="caption">Photo · the Grand Casino stage, opening night</span>
+        <div class="hero-body">
+          <div>
+            <p class="hero-dates" id="dates"></p>
+            <h1>Festival du Rire</h1>
+          </div>
+          <p class="hero-text">
+            Four days of stand-up, galas and workshops in four venues along the
+            boardwalk.
+          </p>
         </div>
-        <div class="cards" id="cards"></div>
+      </section>
+      <div class="live" id="now" aria-live="polite"></div>
+    </div>
+
+    <main>
+      <section class="wrap section" id="programme" aria-labelledby="programme-title">
+        <div class="section-head">
+          <h2 class="section-title" id="programme-title">Programme</h2>
+          <div class="filters">
+            <label>
+              <span class="visually-hidden">Venue</span>
+              <select class="select" id="venue-filter">
+                <option value="">All venues</option>
+              </select>
+            </label>
+            <label>
+              <span class="visually-hidden">Type</span>
+              <select class="select" id="kind-filter">
+                <option value="">All types</option>
+                <option value="solo">Solo shows</option>
+                <option value="lineup">Lineups</option>
+                <option value="workshop">Workshops</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="tabs" id="days" role="group" aria-label="Festival day"></div>
+        <ol class="rows" id="rows"></ol>
+        <p class="night-note">
+          Shows after midnight belong to the evening before: a festival day ends
+          at 06:00.
+        </p>
       </section>
 
-      <section id="artists">
-        <h2>Artists</h2>
-        <div class="artist-grid" id="artist-grid"></div>
+      <section class="wrap section" id="artists" aria-labelledby="artists-title">
+        <div class="section-head">
+          <h2 class="section-title" id="artists-title">Artists</h2>
+          <span class="muted" id="artist-count"></span>
+        </div>
+        <div class="grid" id="artist-grid"></div>
+      </section>
+
+      <section class="wrap section" id="venues" aria-labelledby="venues-title">
+        <h2 class="section-title" id="venues-title">Venues</h2>
+        <div class="grid venues" id="venue-grid"></div>
       </section>
     </main>
 
-    <footer class="wrap">
-      A festival day runs until 06:00: late-night shows belong to the evening
-      before.
+    <footer class="wrap site-footer">
+      <p class="big">See you on the boardwalk.</p>
+      <div class="footer-line">
+        <span>Festival du Rire · Deauville · <span id="footer-dates"></span></span>
+        <span><a href="/admin/">Organisers</a> · <a href="/docs">API</a></span>
+      </div>
     </footer>
 
     <script src="/app.js"></script>

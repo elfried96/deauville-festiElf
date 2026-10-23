@@ -3,6 +3,9 @@
 
 let editedId = null; // id of the performance being edited, or null
 let performancesById = {};
+let selectedDay = null; // the festival day shown in the schedule
+
+const KIND_LABELS = { solo: "Solo", lineup: "Lineup", workshop: "Workshop" };
 
 async function callApi(method, url, body) {
   const options = { method: method, headers: {} };
@@ -38,7 +41,12 @@ function showMessage(text, kind) {
   box.innerHTML = "";
   const div = document.createElement("div");
   div.className = `message ${kind}`;
-  div.textContent = text;
+  div.setAttribute("role", kind === "error" ? "alert" : "status");
+  const paragraph = document.createElement("p");
+  paragraph.textContent = text;
+  const close = button("×", () => (box.innerHTML = ""), "close");
+  close.setAttribute("aria-label", "Dismiss");
+  div.append(paragraph, close);
   box.appendChild(div);
   box.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
@@ -79,34 +87,72 @@ async function loadChoices() {
 async function loadSchedule() {
   const performances = await callApi("GET", "/api/programme");
   performancesById = {};
+  const days = {};
+  for (const performance of performances) {
+    performancesById[performance.id] = performance;
+    days[performance.festival_day] = (days[performance.festival_day] || 0) + 1;
+  }
+  if (!(selectedDay in days)) {
+    selectedDay = Object.keys(days).sort()[0] || null;
+  }
+  document.getElementById("lead").textContent =
+    `${performances.length} performances · every change is checked by the server and saved at once.`;
+  showDayTabs(days);
+
   const rows = document.getElementById("rows");
   rows.innerHTML = "";
   for (const performance of performances) {
-    performancesById[performance.id] = performance;
+    if (performance.festival_day !== selectedDay) {
+      continue;
+    }
     const row = document.createElement("tr");
     if (performance.id === editedId) {
       row.className = "editing";
     }
     row.innerHTML = `
-      <td>${performance.festival_day}</td>
-      <td>${performance.start.slice(11)}-${performance.end.slice(11)}</td>
-      <td></td><td></td><td></td>
-      <td class="buttons"></td>`;
+      <td class="time"></td>
+      <td><span class="title"></span><span class="summary"></span></td>
+      <td class="nowrap"></td>
+      <td class="nowrap muted"></td>
+      <td><div class="buttons"></div></td>`;
+    row.querySelector(".time").innerHTML =
+      `${performance.start.slice(11)} <span>– ${performance.end.slice(11)}</span>`;
+    row.querySelector(".title").textContent = performance.title;
+    row.querySelector(".summary").textContent = performance.summary;
     row.children[2].textContent = performance.venue_name;
-    row.children[3].textContent = `${performance.title} (${performance.kind})`;
-    row.children[4].textContent = performance.summary;
+    row.children[3].textContent = KIND_LABELS[performance.kind] || performance.kind;
 
-    const buttons = row.children[5];
+    const buttons = row.querySelector(".buttons");
     if (performance.kind === "workshop") {
       buttons.appendChild(
-        button("Register", () => registerParticipant(performance)),
+        button("Register", () => registerParticipant(performance), "small-button"),
       );
     }
-    buttons.appendChild(button("Edit", () => startEdit(performance.id)));
+    buttons.appendChild(button("Edit", () => startEdit(performance.id), "small-button"));
     buttons.appendChild(
-      button("Cancel", () => cancelPerformance(performance), "danger"),
+      button("Cancel", () => cancelPerformance(performance), "small-button danger"),
     );
     rows.appendChild(row);
+  }
+}
+
+function showDayTabs(days) {
+  const tabs = document.getElementById("days");
+  tabs.innerHTML = "";
+  for (const day of Object.keys(days).sort()) {
+    const label = new Date(day + "T12:00").toLocaleDateString("en-GB", {
+      weekday: "short",
+      day: "numeric",
+    });
+    const tab = button(label, () => {
+      selectedDay = day;
+      loadSchedule();
+    }, "admin-tab");
+    tab.setAttribute("aria-pressed", day === selectedDay);
+    const count = document.createElement("span");
+    count.textContent = ` ${days[day]}`;
+    tab.appendChild(count);
+    tabs.appendChild(tab);
   }
 }
 
@@ -124,7 +170,7 @@ function button(text, onClick, className) {
 // --- Performance form ------------------------------------------------------
 
 function showFieldsOfKind() {
-  const kind = document.getElementById("kind").value;
+  const kind = document.getElementById("performance-form").elements.kind.value;
   for (const fieldset of document.querySelectorAll("fieldset[data-kind]")) {
     fieldset.hidden = fieldset.dataset.kind !== kind;
   }
@@ -212,8 +258,11 @@ function startEdit(id) {
     form.elements.max_participants.value = performance.max_participants;
   }
   showFieldsOfKind();
+  selectedDay = performance.festival_day;
   document.getElementById("form-title").textContent =
     `Edit: ${performance.title}`;
+  document.getElementById("form-hint").textContent =
+    "Moving it to another time or venue gives it a new id.";
   document.getElementById("submit").textContent = "Save changes";
   document.getElementById("cancel-edit").hidden = false;
   form.scrollIntoView({ behavior: "smooth" });
@@ -224,6 +273,8 @@ function stopEdit() {
   editedId = null;
   document.getElementById("performance-form").reset();
   document.getElementById("form-title").textContent = "New performance";
+  document.getElementById("form-hint").textContent =
+    "Every rule is checked by the server before saving.";
   document.getElementById("submit").textContent = "Schedule";
   document.getElementById("cancel-edit").hidden = true;
   showFieldsOfKind();
@@ -293,7 +344,13 @@ async function submitArtist(event) {
 // --- Start -----------------------------------------------------------------
 
 async function start() {
-  document.getElementById("kind").addEventListener("change", showFieldsOfKind);
+  for (const radio of document.querySelectorAll('input[name="kind"]')) {
+    radio.addEventListener("change", showFieldsOfKind);
+  }
+  document.getElementById("new-performance").addEventListener("click", () => {
+    stopEdit();
+    document.getElementById("performance-form").elements.title.focus();
+  });
   document
     .getElementById("performance-form")
     .addEventListener("submit", submitPerformance);

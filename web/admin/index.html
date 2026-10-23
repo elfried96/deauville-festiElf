@@ -3,140 +3,160 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin - Deauville Festival du Rire</title>
+    <title>Admin — Festival du Rire</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/style.css" />
     <link rel="stylesheet" href="/admin/admin.css" />
   </head>
   <body>
-    <header class="masthead">
+    <header class="admin-header">
       <div class="wrap">
-        <p class="eyebrow">Admin</p>
-        <h1>Deauville Festival <span>du Rire</span></h1>
-        <nav class="nav">
-          <a href="/">&larr; Public website</a>
-          <a href="#schedule">Schedule</a>
-          <a href="#performance-form">New performance</a>
-          <a href="#artist-form">New artist</a>
-          <a href="/docs">API</a>
+        <div class="admin-brand">
+          <strong>Festival du Rire</strong>
+          <span class="muted">Admin</span>
+        </div>
+        <nav class="nav" aria-label="Admin">
+          <a href="/">View website</a>
+          <a href="/docs">API docs</a>
         </nav>
       </div>
     </header>
 
-    <main class="wrap">
-      <div id="message"></div>
-
-      <section id="schedule">
-        <h2>Schedule</h2>
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Day</th>
-                <th>Time</th>
-                <th>Venue</th>
-                <th>Title</th>
-                <th>With</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="rows"></tbody>
-          </table>
+    <main class="wrap admin-main">
+      <div class="section-head">
+        <div>
+          <h1 class="admin-title">Schedule</h1>
+          <p class="admin-lead" id="lead">
+            Every change is checked by the server and saved at once.
+          </p>
         </div>
-      </section>
+        <button type="button" class="button" id="new-performance">
+          New performance
+        </button>
+      </div>
 
-      <section>
-        <h2 id="form-title">New performance</h2>
-        <form id="performance-form" class="panel">
-          <div class="grid">
-            <label
-              >Kind
-              <select name="kind" id="kind">
-                <option value="solo">Solo show</option>
-                <option value="lineup">Lineup</option>
-                <option value="workshop">Workshop</option>
-              </select>
-            </label>
-            <label>Title <input name="title" required /></label>
-            <label
-              >Venue
-              <select name="venue" class="venue-select"></select
-            ></label>
-            <label
-              >Start <input name="start" type="datetime-local" required
-            /></label>
-            <label
-              >Duration (min)
-              <input name="duration_minutes" type="number" min="1" required
-            /></label>
-            <label class="wide">Description <input name="description" /></label>
+      <div id="message" aria-live="polite"></div>
+
+      <div class="admin-columns">
+        <section class="schedule" aria-label="Performances">
+          <div class="admin-tabs" id="days" role="group" aria-label="Festival day"></div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Time</th>
+                  <th scope="col">Performance</th>
+                  <th scope="col">Venue</th>
+                  <th scope="col">Type</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
           </div>
+        </section>
 
-          <fieldset data-kind="solo">
-            <legend>Solo show</legend>
-            <div class="grid">
-              <label
-                >Artist
-                <select name="artist" class="artist-select"></select
-              ></label>
-              <label
-                >Minimum age
-                <input name="min_age" type="number" min="0" max="18" value="0"
+        <div class="side">
+          <section class="panel" aria-labelledby="form-title">
+            <h2 id="form-title">New performance</h2>
+            <p class="hint" id="form-hint">
+              Every rule is checked by the server before saving.
+            </p>
+
+            <form id="performance-form">
+              <fieldset>
+                <legend>Type</legend>
+                <div class="segmented">
+                  <input type="radio" name="kind" id="kind-solo" value="solo" checked />
+                  <label for="kind-solo">Solo</label>
+                  <input type="radio" name="kind" id="kind-lineup" value="lineup" />
+                  <label for="kind-lineup">Lineup</label>
+                  <input type="radio" name="kind" id="kind-workshop" value="workshop" />
+                  <label for="kind-workshop">Workshop</label>
+                </div>
+              </fieldset>
+
+              <label class="field">Title <input name="title" required /></label>
+              <div class="two">
+                <label class="field"
+                  >Venue <select name="venue" class="venue-select"></select
+                ></label>
+                <label class="field"
+                  >Duration (min)
+                  <input name="duration_minutes" type="number" min="1" required
+                /></label>
+              </div>
+              <label class="field"
+                >Start <input name="start" type="datetime-local" required
               /></label>
-            </div>
-          </fieldset>
 
-          <fieldset data-kind="lineup">
-            <legend>Lineup</legend>
-            <div class="grid">
-              <label
-                >Host
-                <select name="host" class="artist-select"></select
-              ></label>
-            </div>
-            <p class="muted">Acts, in running order (tick at least two):</p>
-            <div id="acts" class="checks"></div>
-          </fieldset>
+              <fieldset data-kind="solo" class="kind-fields">
+                <div class="two">
+                  <label class="field"
+                    >Artist <select name="artist" class="artist-select"></select
+                  ></label>
+                  <label class="field"
+                    >Minimum age
+                    <input name="min_age" type="number" min="0" max="18" value="0"
+                  /></label>
+                </div>
+              </fieldset>
 
-          <fieldset data-kind="workshop">
-            <legend>Workshop</legend>
-            <div class="grid">
-              <label
-                >Teacher
-                <select name="teacher" class="artist-select"></select
+              <fieldset data-kind="lineup" class="kind-fields">
+                <label class="field"
+                  >Host <select name="host" class="artist-select"></select
+                ></label>
+                <fieldset>
+                  <legend>Acts, in running order (at least two)</legend>
+                  <div id="acts" class="checks"></div>
+                </fieldset>
+              </fieldset>
+
+              <fieldset data-kind="workshop" class="kind-fields">
+                <div class="two">
+                  <label class="field"
+                    >Teacher <select name="teacher" class="artist-select"></select
+                  ></label>
+                  <label class="field"
+                    >Places
+                    <input name="max_participants" type="number" min="1" value="12"
+                  /></label>
+                </div>
+              </fieldset>
+
+              <label class="field"
+                >Description <textarea name="description" rows="2"></textarea
               ></label>
-              <label
-                >Places
-                <input name="max_participants" type="number" min="1" value="12"
+
+              <div class="actions">
+                <button type="submit" class="button" id="submit">Schedule</button>
+                <button type="button" class="button outline" id="cancel-edit" hidden>
+                  Cancel edit
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel" aria-labelledby="artist-title">
+            <h2 id="artist-title">New artist</h2>
+            <form id="artist-form">
+              <label class="field">Name <input name="name" required /></label>
+              <label class="field">Bio <input name="bio" /></label>
+              <label class="field"
+                >Photo URL <input name="photo_url" type="url"
               /></label>
-            </div>
-          </fieldset>
-
-          <div class="actions">
-            <button type="submit" class="primary" id="submit">Schedule</button>
-            <button type="button" id="cancel-edit" hidden>Cancel edit</button>
-          </div>
-        </form>
-      </section>
-
-      <section>
-        <h2>New artist</h2>
-        <form id="artist-form" class="panel">
-          <div class="grid">
-            <label>Name <input name="name" required /></label>
-            <label>Photo URL <input name="photo_url" /></label>
-            <label class="wide">Bio <input name="bio" /></label>
-          </div>
-          <div class="actions">
-            <button type="submit" class="primary">Add artist</button>
-          </div>
-        </form>
-      </section>
+              <div class="actions">
+                <button type="submit" class="button">Add artist</button>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
     </main>
-
-    <footer class="wrap">
-      Every rule is checked by the server: conflicts come back as error
-      messages.
-    </footer>
 
     <script src="/admin/admin.js"></script>
   </body>
