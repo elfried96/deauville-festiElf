@@ -1,9 +1,16 @@
-
 from datetime import date, datetime
 
 import pytest
 
-from models import Artist, Venue, Performance, SoloShow, Lineup, Workshop, Festival
+from deauville.errors import (
+    FestivalConflictError,
+    FestivalNotFoundError,
+    FestivalValidationError,
+)
+from deauville.festival import Festival
+from deauville.models import Artist, Lineup, SoloShow, Venue, Workshop
+
+
 @pytest.fixture
 def festival():
     venue = Venue(
@@ -16,7 +23,7 @@ def festival():
         bio="Humoriste",
         photo_url="",
     )
-    
+
     performance = SoloShow(
         identifier="show-1",
         title="Premier spectacle",
@@ -25,7 +32,6 @@ def festival():
         duration_minutes=60,
         artist=artist.slug,
     )
-
 
     return Festival(
         venues=[venue],
@@ -43,8 +49,6 @@ def make_venue(name="Autre salle"):
 
 def make_artist(name="Autre artiste"):
     return Artist(name=name, bio="Artiste de test", photo_url="")
-
-
 
 
 def make_performance(
@@ -116,9 +120,8 @@ def test_up_next_returns_future_performances(festival):
 def test_unknown_venue_is_rejected(festival):
     performance = make_performance(venue="lieu-inexistant")
 
-    with pytest.raises(ValueError, match="Unknown venue"):
+    with pytest.raises(FestivalNotFoundError, match="No venue"):
         festival.add_performance(performance)
-
 
 
 def test_unknown_artist_is_rejected(festival):
@@ -127,21 +130,19 @@ def test_unknown_artist_is_rejected(festival):
         artist="artiste-inexistant",
     )
 
-    with pytest.raises(ValueError, match="Unknown artist"):
+    with pytest.raises(FestivalNotFoundError, match="Unknown artist"):
         festival.add_performance(performance)
 
 
-
-
-
 def test_artist_in_lineup_conflict_is_rejected(festival):
-    festival.venues.append(make_venue())
+    festival.add_venue(make_venue())
 
     # Enregistrer tous les artistes du Lineup.
     host = make_artist(name="Animateur")
     second_artist = make_artist(name="Artiste 2")
 
-    festival.artists.extend([host, second_artist])
+    festival.add_artist(host)
+    festival.add_artist(second_artist)
 
     performance = make_performance(
         kind="lineup",
@@ -149,25 +150,20 @@ def test_artist_in_lineup_conflict_is_rejected(festival):
         acts=["karim-benali", second_artist.slug],
     )
 
-    with pytest.raises(ValueError, match="Karim Benali is on stage"):
+    with pytest.raises(FestivalConflictError, match="Karim Benali is on stage"):
         festival.add_performance(performance)
-
-
-
-
-
 
 
 def test_venue_conflict_is_rejected(festival):
     another_artist = make_artist()
-    festival.artists.append(another_artist)
+    festival.add_artist(another_artist)
 
     performance = make_performance(
         venue="le-kiosque",
         artist=another_artist.slug,
     )
 
-    with pytest.raises(ValueError, match="Le Kiosque is already booked"):
+    with pytest.raises(FestivalConflictError, match="Le Kiosque is already booked"):
         festival.add_performance(performance)
 
 
@@ -179,19 +175,83 @@ def test_one_am_belongs_to_previous_festival_day():
     assert performance.festival_day == date(2027, 6, 11)
 
 
-
 def test_date_outside_festival_is_rejected(festival):
     performance = make_performance(
         venue="le-kiosque",
         start=datetime(2027, 6, 14, 20, 0),
     )
 
-    with pytest.raises(ValueError, match="not a day of the festival"):
+    with pytest.raises(FestivalConflictError, match="not a day of the festival"):
         festival.add_performance(performance)
-
 
 
 @pytest.mark.parametrize("duration", [0, 361])
 def test_invalid_duration_is_rejected(duration):
-    with pytest.raises(ValueError, match="Duration must be between 1 and 360"):
+    with pytest.raises(FestivalValidationError, match="Duration must be between"):
         make_performance(duration=duration)
+
+
+def test_lineup_needs_two_acts():
+    with pytest.raises(FestivalValidationError, match="at least two acts"):
+        make_performance(kind="lineup", acts=["artiste-1"])
+
+
+def test_collections_cannot_be_changed_from_outside(festival):
+    festival.performances.clear()
+    festival.artists.clear()
+
+    assert len(festival.performances) == 1
+    assert len(festival.artists) == 1
+
+
+def test_refused_move_leaves_the_schedule_as_it_was(festival):
+    festival.add_venue(make_venue())
+    other = make_artist()
+    festival.add_artist(other)
+    festival.add_performance(
+        make_performance(
+            identifier="show-2",
+            venue="autre-salle",
+            start=datetime(2027, 6, 11, 18, 0),
+            artist=other.slug,
+        )
+    )
+    before = [p.id for p in festival.performances]
+
+    # Karim Benali joue déjà à 20:00 : on essaie de déplacer son concurrent.
+    moved = make_performance(
+        identifier="moved",
+        venue="autre-salle",
+        start=datetime(2027, 6, 11, 20, 0),
+        artist="karim-benali",
+    )
+
+    with pytest.raises(FestivalConflictError):
+        festival.replace_performance("show-2", moved)
+
+    assert [p.id for p in festival.performances] == before
+
+
+def test_workshop_refuses_twice_the_same_name_and_when_full():
+    workshop = make_performance(kind="workshop")
+    workshop.max_participants = 2
+
+    workshop.register("Lou")
+    with pytest.raises(FestivalConflictError, match="already registered"):
+        workshop.register("Lou")
+
+    workshop.register("Zoé")
+    with pytest.raises(FestivalConflictError, match="full"):
+        workshop.register("Adam")
+
+
+def test_only_a_workshop_takes_participants(festival):
+    with pytest.raises(FestivalValidationError, match="not a workshop"):
+        festival.register_participant("show-1", "Lou")
+
+
+def test_same_artist_name_twice_is_refused(festival):
+    festival.add_artist(Artist(name="Zoé Tanguy"))
+
+    with pytest.raises(FestivalConflictError, match="already exists"):
+        festival.add_artist(Artist(name="zoe tanguy"))

@@ -13,3 +13,6 @@ B*/side/output/
 
 # Written by the side examples
 B5/side/notes.json
+
+# PyCharm
+.idea/

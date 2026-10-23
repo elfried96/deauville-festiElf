@@ -52,11 +52,12 @@ wheels = [
 ]
 
 [[package]]
-name = "deauville-track"
+name = "deauville"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
+    { name = "pydantic" },
     { name = "uvicorn" },
 ]
 
@@ -70,6 +71,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115" },
+    { name = "pydantic", specifier = ">=2.13.5" },
     { name = "uvicorn", specifier = ">=0.30" },
 ]
 

@@ -1,14 +1,25 @@
+"""La ligne de commande : `uv run deauville ...`."""
 
 import sys
-import json
 from datetime import date, datetime
 
-from .models import (
-    Festival,
-    Performance,
-    load_festival,
-    save_festival,
-)
+from .errors import FestivalError
+from .festival import Festival, load_festival, save_festival
+from .models import performance_from_data
+from .storage import DEFAULT_DATA_FILE, JSONStorage, Storage
+
+USAGE = """\
+Usage:
+  uv run deauville
+  uv run deauville venues
+  uv run deauville programme YYYY-MM-DD
+  uv run deauville artist ARTIST-SLUG
+  uv run deauville now YYYY-MM-DDTHH:MM
+  uv run deauville stats
+  uv run deauville add
+  uv run deauville cancel PERFORMANCE-ID
+  uv run deauville serve [--port PORT]
+Every command accepts --data FILE to use another data file."""
 
 
 def show_summary(festival: Festival) -> None:
@@ -22,12 +33,10 @@ def show_summary(festival: Festival) -> None:
 
 
 def show_venues(festival: Festival) -> None:
-    total_seats = 0
-
     for venue in festival.venues:
         print(f"{venue.slug}: {venue.name}, {venue.capacity} seats")
-        total_seats += venue.capacity
 
+    total_seats = sum(venue.capacity for venue in festival.venues)
     print(f"Total: {total_seats} seats")
 
 
@@ -38,7 +47,7 @@ def show_programme(festival: Festival, day_text: str) -> None:
         print(f"Invalid date '{day_text}'. Use YYYY-MM-DD.")
         return
 
-    performances = festival.programme_for_day(day)
+    performances = festival.programme(day=day)
 
     if not performances:
         days = ", ".join(d.isoformat() for d in festival.days)
@@ -51,25 +60,15 @@ def show_programme(festival: Festival, day_text: str) -> None:
 
 
 def show_artist(festival: Festival, slug: str) -> None:
-    artist = festival.find_artist(slug)
-
-    if artist is None:
-        print(f"No artist '{slug}'.")
-        return
-
+    artist = festival.get_artist(slug)
     print(artist.name)
 
     for performance in festival.performances_for_artist(slug):
-        role = performance.role_of(slug)
-
-        if role is None:
-            continue
-
         print(
             f"{performance.festival_day:%a %d} "
             f"{performance.start:%H:%M}-{performance.end:%H:%M} | "
-            f"{performance._venue_name} | "
-            f"{performance.title} ({role})"
+            f"{performance.venue_name} | "
+            f"{performance.title} ({performance.role_of(slug)})"
         )
 
 
@@ -83,13 +82,12 @@ def show_now(festival: Festival, moment_text: str) -> None:
     print(f"On stage at {moment:%Y-%m-%d %H:%M}:")
 
     ongoing = festival.now_playing(moment)
-    if ongoing:
-        for performance in ongoing:
-            print(
-                f"- {performance.title} at {performance._venue_name}, "
-                f"until {performance.end:%H:%M}"
-            )
-    else:
+    for performance in ongoing:
+        print(
+            f"- {performance.title} at {performance.venue_name}, "
+            f"until {performance.end:%H:%M}"
+        )
+    if not ongoing:
         print("- Nothing is on stage.")
 
     print("Up next:")
@@ -98,60 +96,44 @@ def show_now(festival: Festival, moment_text: str) -> None:
 
 
 def show_stats(festival: Festival) -> None:
-    kinds = {}
+    performances = festival.performances
 
-    for performance in festival.performances:
+    kinds: dict[str, int] = {}
+    for performance in performances:
         kinds[performance.kind] = kinds.get(performance.kind, 0) + 1
 
     print("Performances by kind:")
-    for kind, count in kinds.items():
+    for kind, count in sorted(kinds.items()):
         print(f"{kind}: {count}")
 
     print("\nAt Le Kiosque:")
     for performance in festival.performances_for_venue("le-kiosque"):
         print(
-            f"- {performance.start.isoformat(timespec='minutes')} "
-            f"{performance.venue}"
+            f"- {performance.start.isoformat(timespec='minutes')} {performance.title}"
         )
 
-    if festival.performances:
-        longest = max(
-            festival.performances,
-            key=lambda p: p.duration_minutes,
-        )
+    if performances:
+        longest = max(performances, key=lambda p: p.duration_minutes)
+        print(f"\nLongest: {longest.title} ({longest.duration_minutes} min)")
+
+    print()
+    for workshop in festival.workshops():
         print(
-            f"\nLongest: {longest.title} "
-            f"({longest.duration_minutes}min)"
+            f"{workshop.title} on {workshop.festival_day}: "
+            f"{len(workshop.participants)}/{workshop.places} registered"
         )
 
-    for performance in festival.performances:
-        if performance.kind == "workshop":
-            registered = len(performance.participants)
-            capacity = performance.max_participants
-            print(
-                f"{performance.title} on {performance.festival_day}: "
-                f"{registered}/{capacity} registered"
-            )
+    # Chaque artiste compte une fois par performance, quel que soit son rôle.
+    appearances: dict[str, int] = {}
+    for performance in performances:
+        for slug in performance.artist_slugs():
+            appearances[slug] = appearances.get(slug, 0) + 1
 
-    artists_count = {}
-    for performance in festival.performances:
-        if performance.kind == "solo" and performance.artist:
-            slug = performance.artist
-            artists_count[slug] = artists_count.get(slug, 0) + 1
-        elif performance.kind == "lineup":
-            for slug in performance.acts:
-                artists_count[slug] = artists_count.get(slug, 0) + 1
-
-    frequent = [
-        slug for slug, count in artists_count.items() if count >= 4
-    ]
+    frequent = [slug for slug, count in appearances.items() if count >= 4]
     print(f"\nOn stage 4 times: {', '.join(frequent)}")
 
 
-def add_performance(
-    festival: Festival,
-    data_file: str | None = None,
-) -> None:
+def add_performance(festival: Festival, storage: Storage) -> None:
     title = input("Title: ").strip()
     artist = input("Artist (slug): ").strip()
     venue = input("Venue (slug): ").strip()
@@ -161,106 +143,91 @@ def add_performance(
     try:
         duration = int(duration_text)
     except ValueError:
-        raise ValueError(
-            f"'{duration_text}' is not a number of minutes."
-        ) from None
+        print(f"Error: '{duration_text}' is not a number of minutes.")
+        sys.exit(1)
 
-    try:
-        start = datetime.fromisoformat(start_text)
-    except ValueError:
-        raise ValueError(
-            f"'{start_text}' is not a valid date and time."
-        ) from None
-
-    identifier = f"{venue}-{start:%Y-%m-%d-%H%M}"
-
-    performance = Performance(
-        identifier=identifier,
-        kind="solo",
-        title=title,
-        venue=venue,
-        start=start,
-        duration_minutes=duration,
-        artist=artist,
+    performance = performance_from_data(
+        {
+            "kind": "solo",
+            "title": title,
+            "artist": artist,
+            "venue": venue,
+            "start": start_text,
+            "duration_minutes": duration,
+        }
     )
 
     festival.add_performance(performance)
-    save_festival(festival, data_file)
+    save_festival(festival, storage)
     print(f"Added: {performance.id}")
 
 
-def cancel_performance(
-    festival: Festival,
-    identifier: str,
-    data_file: str | None = None,
-) -> None:
+def cancel_performance(festival: Festival, storage: Storage, identifier: str) -> None:
     performance = festival.cancel_performance(identifier)
-    save_festival(festival, data_file)
+    save_festival(festival, storage)
     print(f"Cancelled: {performance.title}")
 
 
+def serve(storage: Storage, port: int = 8000) -> None:
+    import uvicorn
 
-def main() -> None:
-    args = sys.argv[1:]
-    data_file = None
-    if args == ["serve"]:
-        import uvicorn
+    from .api import create_app
 
-        uvicorn.run(
-            "deauville.api:app",
-            host="127.0.0.1",
-            port=8000,
-        )
-        return
+    print(f"Website: http://127.0.0.1:{port}/  Admin: http://127.0.0.1:{port}/admin/")
+    uvicorn.run(create_app(storage), host="127.0.0.1", port=port)
+
+
+def take_option(args: list[str], name: str) -> str | None:
+    """Retire `name VALUE` de `args` et renvoie VALUE (None si absent)."""
+    if name not in args:
+        return None
+
+    index = args.index(name)
+    if index + 1 >= len(args):
+        print(f"Error: the option {name} needs a value.")
+        sys.exit(2)
+
+    value = args[index + 1]
+    del args[index : index + 2]
+    return value
+
+
+def main(argv: list[str] | None = None) -> None:
+    args = list(sys.argv[1:] if argv is None else argv)
+
+    data_file = take_option(args, "--data")
+    port_text = take_option(args, "--port")
+    storage = JSONStorage(data_file or DEFAULT_DATA_FILE)
+
     try:
-        if "--data" in args:
-            index = args.index("--data")
+        if args == ["serve"]:
+            serve(storage, int(port_text or 8000))
+            return
 
-            if index + 1 >= len(args):
-                raise ValueError(
-                    "The --data option requires a JSON file path."
-                )
+        festival = load_festival(storage)
 
-            data_file = args[index + 1]
-            del args[index:index + 2]
+        match args:
+            case []:
+                show_summary(festival)
+            case ["venues"]:
+                show_venues(festival)
+            case ["programme", day]:
+                show_programme(festival, day)
+            case ["artist", slug]:
+                show_artist(festival, slug)
+            case ["now", moment]:
+                show_now(festival, moment)
+            case ["stats"]:
+                show_stats(festival)
+            case ["add"]:
+                add_performance(festival, storage)
+            case ["cancel", identifier]:
+                cancel_performance(festival, storage, identifier)
+            case _:
+                print(USAGE)
+                sys.exit(2)
 
-        festival = load_festival(data_file)
-
-        if not args:
-            show_summary(festival)
-        elif args == ["venues"]:
-            show_venues(festival)
-        elif len(args) == 2 and args[0] == "programme":
-            show_programme(festival, args[1])
-        elif len(args) == 2 and args[0] == "artist":
-            show_artist(festival, args[1])
-        elif len(args) == 2 and args[0] == "now":
-            show_now(festival, args[1])
-        elif args == ["stats"]:
-            show_stats(festival)
-        elif args == ["add"]:
-            add_performance(festival, data_file)
-        elif len(args) == 2 and args[0] == "cancel":
-            cancel_performance(festival, args[1], data_file)
-        else:
-            print("Usage:")
-            print("  uv run deauville")
-            print("  uv run deauville venues")
-            print("  uv run deauville programme YYYY-MM-DD")
-            print("  uv run deauville artist ARTIST-SLUG")
-            print("  uv run deauville now YYYY-MM-DDTHH:MM")
-            print("  uv run deauville add")
-            print("  uv run deauville cancel PERFORMANCE-ID")
-            print("  uv run deauville stats")
-            print("  uv run deauville --data FILE programme YYYY-MM-DD")
-
-    except json.JSONDecodeError:
-        print("Error: the festival JSON file is damaged.")
-        sys.exit(1)
-    except FileNotFoundError:
-        print("Error: the festival JSON file was not found.")
-        sys.exit(1)
-    except ValueError as error:
+    except FestivalError as error:
         print(f"Error: {error}")
         sys.exit(1)
 

@@ -1,12 +1,13 @@
 
 [project]
-name = "deauville-track"
+name = "deauville"
 version = "0.1.0"
-description = "Object-oriented programming in Python - the project track (sheets and side examples)"
+description = "The programme of the Deauville Festival du Rire: models, JSON API and command line"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi>=0.115",
+    "pydantic>=2.13.5",
     "uvicorn>=0.30",
 ]
 
