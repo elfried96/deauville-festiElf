@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 from deauville.api import create_app
 from deauville.cli import main
+from deauville.errors import FestivalStorageError
 from deauville.storage import JSONStorage, MemoryStorage
 
 DATA = {
@@ -176,3 +177,165 @@ def test_cli_uses_the_data_option(tmp_path, capsys):
     main(["--data", str(data_file), "programme", "2027-06-13"])
 
     assert "Maya Live" in capsys.readouterr().out
+
+
+# --- Étape 12 : le reste du contrat d'API.md --------------------------------
+
+LINEUP = {
+    "kind": "lineup",
+    "title": "Gala",
+    "venue": "grand-casino",
+    "start": "2027-06-10T20:30",
+    "duration_minutes": 90,
+    "host": "max-pellerin",
+    "acts": ["nora-lebrun", "maya-choukri"],
+}
+
+
+def test_programme_filters(client):
+    client.post("/api/performances", json=LINEUP)
+
+    everything = client.get("/api/programme").json()
+    assert [p["start"] for p in everything] == sorted(p["start"] for p in everything)
+
+    kiosque = client.get("/api/programme", params={"venue": "le-kiosque"}).json()
+    assert {p["venue"] for p in kiosque} == {"le-kiosque"}
+
+    both = client.get(
+        "/api/programme", params={"day": "2027-06-10", "venue": "grand-casino"}
+    ).json()
+    assert [p["title"] for p in both] == ["Gala"]
+
+
+def test_a_lineup_view(client):
+    created = client.post("/api/performances", json=LINEUP).json()
+
+    view = client.get(f"/api/performances/{created['id']}").json()
+    assert view["host"] == "max-pellerin"
+    assert view["acts"] == ["nora-lebrun", "maya-choukri"]
+    # Tout le monde sur scène, dans l'ordre d'apparition : l'animateur d'abord.
+    assert [a["slug"] for a in view["artists"]] == [
+        "max-pellerin",
+        "nora-lebrun",
+        "maya-choukri",
+    ]
+    assert view["summary"] == "hosted by Max Pellerin, with Nora Lebrun, Maya Choukri"
+    assert view["end"] == "2027-06-10T22:00"
+
+
+def test_a_workshop_view(client):
+    view = client.get("/api/performances/grand-casino-2027-06-12-1030").json()
+    assert view["capacity"] == 2
+    assert view["places_left"] == 2
+    assert view["participants"] == []
+
+
+def test_now_gives_three_at_most(client):
+    client.post("/api/performances", json=LINEUP)
+    client.post("/api/performances", json=NORA)
+
+    now = client.get("/api/now", params={"at": "2027-06-01T12:00"}).json()
+    assert now["now_playing"] == []
+    assert len(now["up_next"]) == 3
+
+
+def test_night_belongs_to_the_previous_day(client):
+    night = {**NORA, "start": "2027-06-12T01:00"}
+    view = client.post("/api/performances", json=night).json()
+    assert view["festival_day"] == "2027-06-11"
+
+
+@pytest.mark.parametrize(
+    ("change", "status"),
+    [
+        ({"venue": "nowhere"}, 404),
+        ({"artist": "nobody"}, 404),
+        ({"start": "2027-06-20T20:00"}, 409),
+        ({"duration_minutes": 0}, 422),
+        ({"duration_minutes": 361}, 422),
+        ({"title": "  "}, 422),
+        ({"kind": "concert"}, 422),
+        ({"min_age": 25}, 422),
+    ],
+)
+def test_each_error_status(client, change, status):
+    response = client.post("/api/performances", json={**NORA, **change})
+    assert response.status_code == status
+    assert isinstance(response.json()["detail"], str)
+
+
+def test_same_slot_twice_is_409(client):
+    assert client.post("/api/performances", json=NORA).status_code == 201
+    assert client.post("/api/performances", json=NORA).status_code == 409
+
+
+def test_put_can_keep_its_own_slot(client):
+    client.post("/api/performances", json=NORA)
+    response = client.put(
+        "/api/performances/le-kiosque-2027-06-13-1100",
+        json={**NORA, "title": "Nouveau titre"},
+    )
+    assert response.status_code == 200
+    assert response.json()["title"] == "Nouveau titre"
+
+
+def test_put_unknown_is_404(client):
+    response = client.put("/api/performances/nothing", json=NORA)
+    assert response.status_code == 404
+
+
+def test_delete_twice(client):
+    url = "/api/performances/le-kiosque-2027-06-13-1500"
+    assert client.delete(url).status_code == 204
+    assert client.delete(url).status_code == 404
+
+
+def test_wrong_parameter_is_refused_by_fastapi(client):
+    response = client.get("/api/programme", params={"day": "June 11"})
+    assert response.status_code == 422
+    assert isinstance(response.json()["detail"], list)
+
+
+# --- Le fichier : une copie dans tmp_path, jamais data/festival.json --------
+
+
+@pytest.fixture
+def data_file(tmp_path):
+    path = tmp_path / "festival.json"
+    JSONStorage(path).save(DATA)
+    return path
+
+
+def test_every_change_is_saved_to_the_file(data_file):
+    client = TestClient(create_app(JSONStorage(data_file)))
+    client.post("/api/performances", json=NORA)
+
+    # Une nouvelle application sur le même fichier voit le changement.
+    restarted = TestClient(create_app(JSONStorage(data_file)))
+    response = restarted.get("/api/performances/le-kiosque-2027-06-13-1100")
+    assert response.status_code == 200
+
+
+def test_missing_file_is_500(tmp_path):
+    client = TestClient(create_app(JSONStorage(tmp_path / "missing.json")))
+    response = client.get("/api/venues")
+    assert response.status_code == 500
+    assert "not found" in response.json()["detail"]
+
+
+def test_damaged_file_is_500(data_file):
+    data_file.write_text("{ not json", encoding="utf-8")
+    client = TestClient(create_app(JSONStorage(data_file)))
+    assert client.get("/api/programme").status_code == 500
+
+
+def test_file_that_cannot_be_written_is_500(tmp_path):
+    class ReadOnlyStorage(MemoryStorage):
+        def save(self, data):
+            raise FestivalStorageError("The data file cannot be written.")
+
+    client = TestClient(create_app(ReadOnlyStorage(DATA)))
+    response = client.post("/api/performances", json=NORA)
+    assert response.status_code == 500
+    # Rien n'a changé.
+    assert client.get("/api/performances/le-kiosque-2027-06-13-1100").status_code == 404
