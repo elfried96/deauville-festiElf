@@ -4,45 +4,79 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Festival du Rire — Deauville 2027</title>
+    <meta
+      name="description"
+      content="Four days of stand-up, galas and workshops on the Deauville seafront, 10-13 June 2027."
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
       rel="stylesheet"
     />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
-    <header class="wrap site-header">
-      <a class="brand" href="/">
-        <strong>Festival du Rire</strong>
-        <span>Deauville 2027</span>
-      </a>
-      <nav class="nav" aria-label="Main">
-        <a href="#programme">Programme</a>
-        <a href="#artists">Artists</a>
-        <a href="#venues">Venues</a>
-        <a class="button" href="#programme">See the programme</a>
-      </nav>
-    </header>
+    <section class="cover" aria-label="Festival du Rire">
+      <div class="cover-photos">
+        <img
+          src="/images/stage.jpg"
+          alt="A comedy stage, a microphone in a pool of blue light"
+        />
+        <figure>
+          <img
+            src="/images/parasols.jpg"
+            alt="The closed parasols of Deauville beach under a blue sky"
+          />
+          <figcaption>Deauville, Normandy</figcaption>
+        </figure>
+      </div>
+      <header class="wrap site-header on-photo">
+        <a class="brand" href="/">
+          <svg class="mark" viewBox="0 0 32 40" aria-hidden="true">
+          <path d="M16 16H3a13 13 0 0 1 6.5-11.26z" fill="#e8643c" />
+          <path d="M16 16L9.5 4.74a13 13 0 0 1 13 0z" fill="currentColor" />
+          <path d="M16 16l6.5-11.26A13 13 0 0 1 29 16z" fill="#e8643c" />
+          <rect x="11" y="16" width="10" height="5" rx="2.5" fill="currentColor" />
+          <rect x="14" y="20" width="4" height="18" rx="2" fill="currentColor" />
+        </svg>
+          <span class="brand-name"><strong>Festival du Rire</strong><span>Deauville 2027</span></span>
+        </a>
+        <nav class="nav" aria-label="Main">
+          <a href="#programme">Programme</a>
+          <a href="#artists">Artists</a>
+          <a href="#venues">Venues</a>
+          <a href="#story">The festival</a>
+          <a class="button light" href="#programme">See the programme</a>
+        </nav>
+      </header>
+      <div class="wrap cover-body">
+        <p class="cover-dates" id="dates"></p>
+        <h1>Festival <em>du Rire</em></h1>
+        <p class="cover-text">
+          Four days of stand-up, galas and workshops on the Deauville seafront,
+          from the Grand Casino to a beach hut by the lifeguard post.
+        </p>
+        <div class="cover-actions">
+          <a class="button light" href="#programme">See the programme</a>
+          <a class="button ghost" href="#story">About the festival</a>
+        </div>
+      </div>
+    </section>
 
     <div class="wrap">
-      <section class="hero" aria-label="Festival">
-        <span class="caption">Photo · the Grand Casino stage, opening night</span>
-        <div class="hero-body">
-          <div>
-            <p class="hero-dates" id="dates"></p>
-            <h1>Festival du Rire</h1>
-          </div>
-          <p class="hero-text">
-            Four days of stand-up, galas and workshops in four venues along the
-            boardwalk.
-          </p>
-        </div>
-      </section>
       <div class="live" id="now" aria-live="polite"></div>
     </div>
 
     <main>
+      <section class="wrap figures" aria-label="The festival in figures">
+        <dl id="figures"></dl>
+      </section>
+
+      <section class="wrap" aria-label="The four days">
+        <ol class="glance" id="glance"></ol>
+      </section>
+
       <section class="wrap section" id="programme" aria-labelledby="programme-title">
         <div class="section-head">
           <h2 class="section-title" id="programme-title">Programme</h2>
@@ -72,6 +106,35 @@
         </p>
       </section>
 
+      <section class="wrap section story" id="story" aria-labelledby="story-title">
+        <figure class="story-picture">
+          <img
+            src="/images/boudin-concert.jpg"
+            alt="Eugène Boudin's painting of an open-air concert at the Deauville casino in 1865"
+          />
+          <figcaption>Eugène Boudin, <em>Concert at the Casino of Deauville</em>, 1865</figcaption>
+        </figure>
+        <div class="story-text">
+          <p class="eyebrow">The festival</p>
+          <h2 class="section-title" id="story-title">Laughter, on the boardwalk</h2>
+          <p>
+            Deauville has entertained its summer crowds since the 1860s: concerts
+            at the casino, promenades on Les Planches, evenings that run late.
+            The Festival du Rire brings that tradition to comedy.
+          </p>
+          <p>
+            For four days in June, the town's stages belong to stand-up: solo
+            shows in the theatre, galas at the Grand Casino, late-night lineups
+            on the beach promenade, and workshops for anyone who wants to try.
+          </p>
+          <img
+            class="story-detail"
+            src="/images/stage.jpg"
+            alt="An empty comedy stage, a microphone in a pool of blue light"
+          />
+        </div>
+      </section>
+
       <section class="wrap section" id="artists" aria-labelledby="artists-title">
         <div class="section-head">
           <h2 class="section-title" id="artists-title">Artists</h2>
@@ -81,17 +144,39 @@
       </section>
 
       <section class="wrap section" id="venues" aria-labelledby="venues-title">
-        <h2 class="section-title" id="venues-title">Venues</h2>
+        <div class="section-head">
+          <h2 class="section-title" id="venues-title">Four stages, one seafront</h2>
+        </div>
         <div class="grid venues" id="venue-grid"></div>
       </section>
     </main>
 
-    <footer class="wrap site-footer">
-      <p class="big">See you on the boardwalk.</p>
-      <div class="footer-line">
+    <footer class="site-footer">
+      <div class="footer-photo">
+        <img
+          src="/images/planches-beach.jpg"
+          alt="Les Planches, the wooden boardwalk of Deauville, along an empty beach"
+        />
+        <p class="wrap big">See you on the boardwalk.</p>
+      </div>
+      <div class="wrap footer-line">
         <span>Festival du Rire · Deauville · <span id="footer-dates"></span></span>
         <span><a href="/admin/">Organisers</a> · <a href="/docs">API</a></span>
       </div>
+      <details class="wrap credits">
+        <summary>Photo credits</summary>
+        <ul>
+          <li>Parasols: Yeuzio, CC BY-SA 4.0</li>
+          <li>Beach huts: Pinpin, CC BY 2.5</li>
+          <li>Grand Casino: Derbrauni, CC BY 4.0</li>
+          <li>Comedy stage: Carlos Delgado, CC BY-SA 3.0</li>
+          <li>Theatre (illustration): Dllu, CC BY-SA 4.0</li>
+          <li>Folded parasols: corinne potet, CC BY 3.0</li>
+          <li>Les Planches: Crochet.david, CC BY-SA 3.0</li>
+          <li>Eugène Boudin, 1865: public domain</li>
+          <li>All via Wikimedia Commons</li>
+        </ul>
+      </details>
     </footer>
 
     <script src="/app.js"></script>

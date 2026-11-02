@@ -6,7 +6,7 @@ ligne de commande, une API JSON (FastAPI), un site public et une admin pour
 les organisateurs. Toutes les règles du festival sont vérifiées au même
 endroit, et chaque refus est une phrase claire.
 
-![Accueil du site : grande photo d'ouverture, titre du festival et bandeau « Live now »](docs/images/home.png)
+![Accueil du site : une scène de stand-up et les parasols de Deauville, le titre du festival et le bandeau « Live now »](docs/images/home.png)
 
 Projet du cours de programmation orientée objet, ECE Paris 2026-2027. Les
 fiches du cours sont dans `B1/` à `B5/` (voir [COURSE.md](COURSE.md)).
@@ -108,7 +108,7 @@ src/deauville/          le programme (un module par sujet)
 ├── api.py              create_app(storage) : les routes d'API.md, le site, l'admin
 └── cli.py              main() : la commande `deauville`
 web/
-├── public/             le site : index.html, artist.html, app.js, style.css
+├── public/             le site : index.html, artist.html, app.js, style.css, images/
 └── admin/              l'admin : index.html, admin.js, admin.css
 tests/
 ├── test_festival.py    les règles, directement sur les objets
@@ -144,6 +144,7 @@ Le détail, avec des schémas, est dans [docs/architecture.md](docs/architecture
 | [Architecture](docs/architecture.md) | les modules, les classes, où vivent les règles, une route de l'URL à la règle |
 | [Interface](docs/interface.md) | le site et l'admin : fichiers, design, appels à l'API |
 | [Développement](docs/developpement.md) | tests, outils, et comment ajouter une fonctionnalité |
+| [Crédits](docs/credits.md) | auteurs et licences des photos du site |
 | [API.md](API.md) | le contrat de l'API, route par route |
 
 ## État du projet
@@ -152,8 +153,9 @@ Fait (étapes 00 à 13 du cours, plus le design) :
 
 - toutes les commandes de la ligne de commande, avec `--data` et `--port` ;
 - tout `API.md` : lecture, écriture (admin), erreurs ;
-- le site public (programme filtrable, artistes, lieux, « Live now ») et
-  l'admin, sur ordinateur et téléphone ;
+- le site public (ouverture en photos, chiffres clés, programme filtrable,
+  histoire, artistes en portraits dessinés, lieux, « Live now ») et l'admin,
+  sur ordinateur et téléphone, avec un logo ;
 - 75 tests, `ruff` propre, annotations et docstrings, `uv build`, et un
   clone neuf qui marche.
 
@@ -162,9 +164,9 @@ Pas fait :
 - l'extension SQLite ;
 - `deauville add` n'ajoute que des solos (plateaux et ateliers passent par
   l'admin) ;
-- les photos : le site affiche des emplacements gris, remplacés
-  automatiquement par la photo d'un artiste dès que son `photo_url` est
-  renseigné. Les lieux et l'image d'ouverture n'ont pas encore de photo.
+- les photos des artistes : ils sont fictifs, donc représentés par des
+  portraits dessinés, remplacés automatiquement par une photo dès que leur
+  `photo_url` est renseigné.
 
 Limites connues :
 
@@ -175,5 +177,5 @@ Limites connues :
 - Chaque requête recharge et réécrit tout le fichier, sans verrou : de deux
   écritures exactement simultanées, la dernière gagne.
 - `/api/now` sans `?at=` utilise l'heure de la machine, sans fuseau horaire.
-- La police (Instrument Sans) vient de Google Fonts : hors ligne, le site
-  utilise une police système proche.
+- Les polices (Instrument Sans et Instrument Serif) viennent de Google Fonts :
+  hors ligne, le site utilise des polices système proches.

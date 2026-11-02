@@ -66,7 +66,8 @@ mémoire** :
 ```python
 @pytest.fixture
 def storage():
-    return MemoryStorage(DATA)            # un petit festival de test
+    return MemoryStorage(DATA)  # un petit festival de test
+
 
 @pytest.fixture
 def client(storage):

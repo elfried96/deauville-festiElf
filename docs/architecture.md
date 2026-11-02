@@ -199,7 +199,7 @@ cette table : aucune route, aucune commande ne change.
 `_performances`). On les lit par des propriétés qui renvoient une **copie** :
 
 ```python
-festival.performances.clear()   # vide une copie : le festival n'a pas bougé
+festival.performances.clear()  # vide une copie : le festival n'a pas bougé
 ```
 
 On ne les change que par des méthodes qui vérifient les règles :
@@ -334,8 +334,8 @@ class Storage(ABC):
 L'API ne crée pas son stockage : elle le **reçoit**.
 
 ```python
-app = create_app(JSONStorage("data/festival.json"))   # le serveur
-app = create_app(MemoryStorage(DATA))                 # un test
+app = create_app(JSONStorage("data/festival.json"))  # le serveur
+app = create_app(MemoryStorage(DATA))  # un test
 ```
 
 `uv run deauville serve --data copie.json` construit un `JSONStorage` sur

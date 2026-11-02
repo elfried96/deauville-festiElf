@@ -44,9 +44,9 @@ Website: http://127.0.0.1:8000/  Admin: http://127.0.0.1:8000/admin/
 
 ### L'accueil
 
-![Accueil : photo d'ouverture, dates, titre et bandeau « Live now »](images/home.png)
+![Accueil : la scène et les parasols, le titre et le bandeau « Live now »](images/home.png)
 
-Sous la grande image, le bandeau gris dit ce qui se passe **maintenant** :
+Sous l'ouverture, le bandeau gris dit ce qui se passe **maintenant** :
 
 - pendant le festival : le spectacle en cours, son lieu, son heure de fin, et
   le suivant ;
@@ -58,6 +58,12 @@ Pour voir le site « comme si » on était à un moment précis, ajoutez `?at=` 
 l'adresse : <http://127.0.0.1:8000/?at=2027-06-11T21:00> montre le vendredi
 à 21:00.
 
+Plus bas, les **chiffres clés** du festival et un **aperçu des 4 jours** :
+le nombre de spectacles et les têtes d'affiche de chaque soirée. Cliquer sur
+un jour ouvre son programme.
+
+![Les chiffres clés et l'aperçu des 4 jours](images/figures.png)
+
 ### Le programme
 
 ![Programme du vendredi : onglets de jours, filtres par lieu et par type](images/programme.png)
@@ -65,23 +71,25 @@ l'adresse : <http://127.0.0.1:8000/?at=2027-06-11T21:00> montre le vendredi
 - **Les onglets** choisissent le jour.
 - **Les deux filtres** gardent un seul lieu, ou un seul type (solos, plateaux,
   ateliers). Ils se combinent.
-- **Chaque ligne** donne l'heure de début et de fin, le titre, les artistes
-  (cliquables), le lieu, puis la durée, l'âge minimum ou les places
-  restantes d'un atelier.
+- **Chaque ligne** donne l'heure de début et de fin, les portraits des
+  artistes, le titre, leurs noms (cliquables), le lieu, puis la durée, l'âge
+  minimum ou les places restantes d'un atelier.
 
 **Une journée du festival se termine à 06:00.** « After Hours », qui commence
 le samedi à 01:00, est donc dans le programme du **vendredi** : c'est la fin
 de la soirée du vendredi.
 
-### Les artistes et les lieux
+### L'histoire, les artistes et les lieux
 
-![Les artistes : un portrait, le nom et la bio](images/artists.png)
+![La section « The festival » : le tableau de Boudin et l'histoire du festival](images/story.png)
 
-![Les quatre lieux, avec leur nombre de places](images/venues.png)
+![Les artistes : un portrait dessiné, le nom et la bio](images/artists.png)
 
-Les rectangles gris sont des **emplacements de photos**. Dès qu'un artiste a
-une adresse de photo (`photo_url`, à remplir dans l'admin à la création de
-l'artiste), sa vraie photo s'affiche à la place.
+![Les quatre lieux en photo, avec leur nombre de places](images/venues.png)
+
+Les artistes sont représentés par des **portraits dessinés**. Dès qu'un
+artiste a une adresse de photo (`photo_url`, à remplir dans l'admin à la
+création de l'artiste), sa vraie photo s'affiche à la place.
 
 ### La page d'un artiste
 
@@ -106,8 +114,9 @@ avec lui.
 | --- | --- | --- |
 | ![Accueil sur téléphone](images/phone-home.png) | ![Programme sur téléphone](images/phone-programme.png) | ![Page artiste sur téléphone](images/phone-artist.png) |
 
-Le site s'adapte à l'écran : le menu se resserre, les filtres passent côte à
-côte, et chaque ligne du programme met la vignette à droite.
+Le site s'adapte à l'écran : les deux photos d'ouverture passent l'une
+au-dessus de l'autre, le menu se resserre, les filtres passent côte à côte,
+et les chiffres clés se rangent sur deux colonnes.
 
 ## L'admin
 

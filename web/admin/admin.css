@@ -20,8 +20,13 @@ body {
 
 .admin-brand {
   display: flex;
-  align-items: baseline;
-  gap: 14px;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-brand .mark {
+  width: 22px;
+  height: 28px;
 }
 
 .admin-brand strong {

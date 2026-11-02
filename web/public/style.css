@@ -1,5 +1,6 @@
 /* Festival du Rire — public website and admin.
-   One typeface, black on white, quiet greys; photography carries the colour. */
+   Photography of the Deauville seafront, one sans-serif typeface with a serif
+   accent, black on white; each artist has a colour until they have a photo. */
 
 :root {
   --ink: #111111;
@@ -87,9 +88,22 @@ img {
 
 .brand {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   line-height: 1.1;
   text-decoration: none;
+}
+
+.brand-name {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The festival's mark: a microphone whose head is a Deauville parasol. */
+.mark {
+  width: 26px;
+  height: 33px;
+  flex: none;
 }
 
 .brand strong {
@@ -98,7 +112,7 @@ img {
   letter-spacing: -0.02em;
 }
 
-.brand span {
+.brand-name > span {
   font-size: 13px;
   color: var(--muted);
 }
@@ -162,6 +176,10 @@ img {
   color: var(--paper);
 }
 
+.nav .button.light {
+  color: var(--ink);
+}
+
 /* --- Photos and their placeholders ---------------------------------------- */
 
 .photo {
@@ -177,66 +195,234 @@ img {
   object-fit: cover;
 }
 
-.photo .caption {
-  position: absolute;
-  left: 14px;
-  bottom: 12px;
-  right: 14px;
-  font-size: 13px;
-  color: #55524d;
+/* Without a photo, an artist shows a drawn portrait on their own colour. */
+.photo.portrait svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-/* --- Hero ----------------------------------------------------------------- */
+/* --- Cover: the photo that opens the home page ----------------------------- */
 
-.hero {
+.cover {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  min-height: 680px;
-  border-radius: var(--radius);
+  justify-content: space-between;
+  min-height: max(640px, 92vh);
+  color: var(--paper);
+  background: #1d2a33;
   overflow: hidden;
-  background: #2a2826;
+}
+
+/* Two photos side by side: the stage (laughter) and the beach (Deauville). */
+.cover-photos {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+}
+
+.cover-photos img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-photos > img {
+  object-position: 50% 70%;
+}
+
+.cover-photos figure {
+  position: relative;
+  margin: 0;
+}
+
+.cover-photos figure img {
+  object-position: 60% 50%;
+}
+
+.cover-photos figcaption {
+  position: absolute;
+  right: 24px;
+  bottom: 20px;
+  z-index: 2;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* A dark veil at the top and bottom keeps the white text readable. */
+.cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(10, 14, 18, 0.45), transparent 22%),
+    linear-gradient(to top, rgba(10, 14, 18, 0.82), rgba(10, 14, 18, 0.4) 50%, transparent 85%);
+}
+
+.cover > :not(.cover-photos) {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.site-header.on-photo,
+.site-header.on-photo .brand-name > span {
   color: var(--paper);
 }
 
-.hero .caption {
-  position: absolute;
-  top: 20px;
-  right: 24px;
-  font-size: 13px;
-  color: #c9c5bf;
+.site-header.on-photo .nav a:not(.button):hover {
+  color: var(--paper);
+  box-shadow: inset 0 -2px 0 var(--paper);
 }
 
-.hero-body {
+.cover-body {
+  width: 100%;
+  padding-bottom: 64px;
+}
+
+.cover-dates {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.cover h1 {
+  margin: 0;
+  max-width: 11ch;
+  font-weight: 500;
+  font-size: clamp(64px, 10vw, 168px);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+.cover h1 em {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.cover-text {
+  max-width: 520px;
+  margin: 24px 0 0;
+  font-size: 20px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.cover-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px 64px;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding: 48px;
+  gap: 12px;
+  margin-top: 32px;
 }
 
-.hero-dates {
-  margin: 0 0 12px;
-  font-size: 18px;
-  font-weight: 500;
-  color: #e7e3dd;
+.button.ghost {
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: transparent;
+  color: var(--paper);
 }
 
-.hero h1 {
+.button.ghost:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.button.light:hover {
+  background: #e9e7e3;
+  color: var(--ink);
+}
+
+/* --- Figures -------------------------------------------------------------- */
+
+.figures dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: 24px;
+  margin: 96px 0 0;
+}
+
+.figures div {
+  padding-top: 16px;
+  border-top: 2px solid var(--ink);
+}
+
+.figures dd {
   margin: 0;
+  font-size: clamp(56px, 6vw, 88px);
   font-weight: 500;
-  font-size: clamp(56px, 8vw, 128px);
-  line-height: 0.95;
-  letter-spacing: -0.045em;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
 }
 
-.hero-text {
-  max-width: 380px;
-  margin: 0;
-  font-size: 18px;
-  color: #e7e3dd;
+.figures dt {
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+/* --- The four days at a glance ------------------------------------------- */
+
+.glance {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  margin: 64px 0 0;
+  padding: 0;
+  list-style: none;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #141414;
+  color: var(--paper);
+}
+
+.glance-day {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  padding: 28px 24px 32px;
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
+  color: inherit;
+  text-decoration: none;
+}
+
+.glance li:last-child .glance-day {
+  border-right: 0;
+}
+
+.glance-day:hover {
+  color: inherit;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.glance-day small,
+.glance-day .count {
+  font-size: 14px;
+  color: #b9b6b0;
+}
+
+.glance-day strong {
+  font-size: 64px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.glance-day .count {
+  margin-bottom: 16px;
+}
+
+.glance-day span:not(.count) {
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.glance-day span:not(.count) b {
+  margin-right: 8px;
+  font-weight: 500;
+  color: #b9b6b0;
+  font-variant-numeric: tabular-nums;
 }
 
 /* --- Live now ------------------------------------------------------------- */
@@ -371,7 +557,7 @@ img {
 
 .row {
   display: grid;
-  grid-template-columns: 96px 112px minmax(0, 1fr) 240px;
+  grid-template-columns: 96px 168px minmax(0, 1fr) 240px;
   gap: 24px;
   align-items: center;
   padding: 20px 0;
@@ -393,10 +579,40 @@ img {
   color: var(--muted);
 }
 
-.row .photo {
-  width: 112px;
-  height: 72px;
-  border-radius: 4px;
+.avatars {
+  display: flex;
+}
+
+.avatar {
+  display: block;
+  width: 54px;
+  height: 54px;
+  flex: none;
+  overflow: hidden;
+  border: 3px solid var(--paper);
+  border-radius: 50%;
+  background: var(--tone, var(--surface));
+}
+
+.avatar + .avatar {
+  margin-left: -16px;
+}
+
+.avatar svg,
+.avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar.more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .row-title {
@@ -445,7 +661,7 @@ img {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
   gap: 40px 16px;
   margin-top: 40px;
 }
@@ -463,11 +679,7 @@ img {
 }
 
 .tile .photo {
-  aspect-ratio: 4 / 5;
-}
-
-.venues .tile .photo {
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 1;
 }
 
 .tile-head {
@@ -492,6 +704,102 @@ img {
   margin-top: -10px;
   font-size: 15px;
   color: var(--muted);
+}
+
+/* --- The festival's story ------------------------------------------------ */
+
+.story {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr));
+  gap: 48px 72px;
+  align-items: start;
+}
+
+.story-picture {
+  margin: 0;
+}
+
+.story-picture img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+.story-picture figcaption {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.eyebrow {
+  margin: 0 0 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.story-text p:not(.eyebrow) {
+  max-width: 560px;
+  margin: 24px 0 0;
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+.story-detail {
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 16 / 9;
+  margin-top: 40px;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+/* A venue: its photo, its number of seats over it, its name and address. */
+.venue-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.venue-card .photo {
+  aspect-ratio: 4 / 3;
+  margin-bottom: 14px;
+}
+
+.venue-card .tile-text {
+  margin-top: 0;
+}
+
+.venue-card .seats {
+  position: absolute;
+  left: 18px;
+  bottom: 14px;
+  color: var(--paper);
+  font-size: 56px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
+.venue-card .seats small {
+  margin-left: 6px;
+  font-size: 15px;
+  letter-spacing: 0;
+}
+
+.venue-card .photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.45), transparent 50%);
+}
+
+.venue-card .seats {
+  z-index: 1;
 }
 
 /* --- Artist page ---------------------------------------------------------- */
@@ -609,8 +917,36 @@ img {
   padding-bottom: 40px;
 }
 
+.footer-photo {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 520px;
+  color: var(--paper);
+  overflow: hidden;
+}
+
+.footer-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.footer-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 14, 18, 0.6), transparent 60%);
+}
+
 .site-footer p.big {
-  margin: 0;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin: 0 auto;
+  padding-bottom: 48px;
   font-weight: 500;
   font-size: clamp(40px, 6vw, 88px);
   line-height: 1;
@@ -622,11 +958,52 @@ img {
   flex-wrap: wrap;
   gap: 8px 32px;
   justify-content: space-between;
-  margin-top: 64px;
+  margin-top: 24px;
   padding-top: 20px;
   border-top: 1px solid var(--line);
   font-size: 14px;
   color: var(--muted);
+}
+
+.credits {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.credits summary {
+  cursor: pointer;
+}
+
+.credits ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* --- Hover ---------------------------------------------------------------- */
+
+.tile .photo,
+.venue-card .photo img {
+  transition: transform 0.35s ease;
+}
+
+.tile:hover .photo {
+  transform: translateY(-4px);
+}
+
+.venue-card:hover .photo img {
+  transform: scale(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile .photo,
+  .venue-card .photo img {
+    transition: none;
+  }
 }
 
 /* --- Phones --------------------------------------------------------------- */
@@ -644,12 +1021,72 @@ img {
     display: none;
   }
 
-  .hero {
-    min-height: 520px;
+  .cover {
+    min-height: 640px;
   }
 
-  .hero-body {
-    padding: 24px 20px;
+  .cover-photos {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1.4fr 1fr;
+  }
+
+  .cover-photos figure {
+    grid-row: 1;
+  }
+
+  .cover-photos > img {
+    grid-row: 2;
+  }
+
+  .cover-photos figcaption {
+    display: none;
+  }
+
+  .cover-body {
+    padding-bottom: 40px;
+  }
+
+  .cover-text {
+    font-size: 17px;
+  }
+
+  .site-header.on-photo .nav a:not(.button) {
+    padding: 8px 0;
+  }
+
+  .figures dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 56px;
+  }
+
+  .glance {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 40px;
+  }
+
+  .glance-day {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .glance li:nth-child(2n) .glance-day {
+    border-right: 0;
+  }
+
+  .glance-day strong {
+    font-size: 44px;
+  }
+
+  .glance-day .count {
+    margin-bottom: 8px;
+  }
+
+  .glance-day span:not(.count) {
+    display: none;
+  }
+
+  .footer-photo {
+    min-height: 360px;
   }
 
   .section {
@@ -674,10 +1111,14 @@ img {
   }
 
   .row {
-    grid-template-columns: 56px minmax(0, 1fr) 64px;
+    grid-template-columns: 56px minmax(0, 1fr);
     gap: 6px 14px;
     align-items: start;
     padding: 16px 0;
+  }
+
+  .row .avatars {
+    display: none;
   }
 
   .filters {
@@ -690,13 +1131,6 @@ img {
 
   .filters .select {
     width: 100%;
-  }
-
-  .row .photo {
-    grid-column: 3;
-    grid-row: 1;
-    width: 64px;
-    height: 64px;
   }
 
   .row-title {
@@ -722,6 +1156,12 @@ img {
 
   .show-body {
     grid-column: 1 / -1;
+  }
+
+  .show .pill {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
   }
 
   .facts dd {
