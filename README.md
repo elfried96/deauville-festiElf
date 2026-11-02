@@ -1,28 +1,77 @@
-# Deauville Festival du Rire — le programme
+# Festival du Rire — Deauville 2027
 
-Le programme du **Deauville Festival du Rire** (10-13 juin 2027) en Python :
-des classes pour les lieux, les artistes et les performances, une ligne de
-commande, et une API JSON (FastAPI) qui sert le site public et l'admin des
-organisateurs. Toutes les règles du festival sont vérifiées au même endroit,
-et chaque refus est un message clair.
+Le programme du **Deauville Festival du Rire** (10-13 juin 2027), de A à Z en
+Python : des classes pour les lieux, les artistes et les performances, une
+ligne de commande, une API JSON (FastAPI), un site public et une admin pour
+les organisateurs. Toutes les règles du festival sont vérifiées au même
+endroit, et chaque refus est une phrase claire.
+
+![Accueil du site : grande photo d'ouverture, titre du festival et bandeau « Live now »](docs/images/home.png)
 
 Projet du cours de programmation orientée objet, ECE Paris 2026-2027. Les
-fiches du cours sont dans `B1/` à `B5/` (voir [COURSE.md](COURSE.md)) ; le
-contrat de l'API est [API.md](API.md).
+fiches du cours sont dans `B1/` à `B5/` (voir [COURSE.md](COURSE.md)).
 
-## Installer
+## Sommaire
 
-Il faut [uv](https://docs.astral.sh/uv/).
+- [Aperçu](#aperçu)
+- [Démarrage rapide](#démarrage-rapide)
+- [Commandes](#commandes)
+- [Structure du projet](#structure-du-projet)
+- [Documentation complète](#documentation-complète)
+- [État du projet](#état-du-projet)
+
+## Aperçu
+
+### Le site public
+
+Le programme se lit jour par jour, se filtre par lieu et par type, et chaque
+nom d'artiste mène à sa page. Une journée du festival se termine à 06:00 :
+les spectacles d'après minuit appartiennent à la soirée de la veille.
+
+![Programme du vendredi 11 juin : onglets de jours, filtres, une ligne par spectacle](docs/images/programme.png)
+
+| Page d'un artiste | Sur téléphone |
+| --- | --- |
+| ![Page de Max Pellerin : portrait, bio, chiffres clés et ses quatre passages avec son rôle](docs/images/artist.png) | ![Programme sur téléphone](docs/images/phone-programme.png) |
+
+### L'admin des organisateurs
+
+Programmer, déplacer, annuler un spectacle, inscrire un participant à un
+atelier, ajouter un artiste. L'admin ne contient aucune règle : elle envoie la
+demande à l'API, et le serveur accepte ou refuse avec une phrase.
+
+![Admin : un refus du serveur, « Le Kiosque is already booked for Late Laughs. »](docs/images/admin-refused.png)
+
+## Démarrage rapide
+
+Il faut [uv](https://docs.astral.sh/uv/) (et Python 3.12, que uv installe si
+besoin).
 
 ```bash
 git clone https://github.com/elfried96/deauville-festiElf.git
 cd deauville-festiElf
 uv sync
+uv run deauville serve
 ```
 
-## Lancer
+Puis ouvrir :
 
-### La ligne de commande
+| Adresse | Contenu |
+| --- | --- |
+| <http://127.0.0.1:8000/> | le site public |
+| <http://127.0.0.1:8000/?at=2027-06-11T21:00> | le site « comme si » on était le vendredi à 21:00 |
+| <http://127.0.0.1:8000/admin/> | l'admin |
+| <http://127.0.0.1:8000/docs> | la documentation interactive de l'API |
+
+L'admin écrit dans `data/festival.json`. Pour essayer sans toucher aux
+vraies données :
+
+```bash
+cp data/festival.json /tmp/essai.json
+uv run deauville serve --data /tmp/essai.json
+```
+
+## Commandes
 
 ```bash
 uv run deauville                              # résumé du festival
@@ -33,152 +82,89 @@ uv run deauville now 2027-06-11T21:00         # sur scène à ce moment, et la s
 uv run deauville stats                        # les questions de l'étape 01
 uv run deauville add                          # ajouter un solo (questions posées)
 uv run deauville cancel le-kiosque-2027-06-12-0100
+uv run deauville serve [--port 8001]          # le site, l'admin et l'API
 ```
 
 Chaque commande accepte `--data FICHIER` pour travailler sur un autre fichier
-de données que `data/festival.json`.
+que `data/festival.json`.
 
-### Le serveur
-
-```bash
-uv run deauville serve                        # http://127.0.0.1:8000
-uv run deauville serve --data copie.json --port 8001
-```
-
-- le site : <http://127.0.0.1:8000/>
-- l'admin : <http://127.0.0.1:8000/admin/>
-- la documentation interactive de l'API : <http://127.0.0.1:8000/docs>
-
-### Les tests et les outils
+Les outils du projet :
 
 ```bash
-uv run pytest -v          # tous les tests (ils ne touchent jamais data/festival.json)
+uv run pytest -v          # 75 tests ; aucun ne touche data/festival.json
 uv run ruff check .       # le style
 uv run ruff format .      # la mise en forme
 uv build                  # dist/deauville-0.1.0-py3-none-any.whl
 ```
 
-## Structure
+## Structure du projet
 
 ```
-src/deauville/
-├── errors.py     la famille d'erreurs du festival
-├── storage.py    Storage (interface), JSONStorage, MemoryStorage
-├── models.py     Venue, Artist, Performance et ses trois sous-classes
-├── festival.py   Festival : les collections et les règles ; load/save
-├── api.py        create_app(storage) : les routes d'API.md, le site, l'admin
-└── cli.py        main() : la commande `deauville`
+src/deauville/          le programme (un module par sujet)
+├── errors.py           la famille d'erreurs du festival
+├── storage.py          Storage (interface), JSONStorage, MemoryStorage
+├── models.py           Venue, Artist, Performance et ses trois sous-classes
+├── festival.py         Festival : les collections et les règles ; load/save
+├── api.py              create_app(storage) : les routes d'API.md, le site, l'admin
+└── cli.py              main() : la commande `deauville`
+web/
+├── public/             le site : index.html, artist.html, app.js, style.css
+└── admin/              l'admin : index.html, admin.js, admin.css
 tests/
-├── test_festival.py   les règles, directement sur les objets
-└── test_api.py        tout API.md par HTTP (TestClient), sans serveur
+├── test_festival.py    les règles, directement sur les objets
+└── test_api.py         tout API.md par HTTP, sur un stockage en mémoire
+data/festival.json      les données du festival
+API.md                  le contrat de l'API
+docs/                   la documentation complète
 ```
 
 Chaque module ne dépend que de ceux du dessus de la liste : `errors` ne
-dépend de rien, `api` et `cli` sont tout en bas et ne contiennent aucune
-règle.
+dépend de rien ; `api` et `cli` sont tout en bas et ne contiennent aucune
+règle. Le site et l'admin ne parlent qu'à l'API.
 
-### Les classes, et pourquoi
+En une phrase par idée :
 
-- **`Venue`, `Artist`** (dataclasses) : des données simples. Le slug est une
-  propriété calculée à partir du nom, il ne peut donc pas être faux. Deux
-  artistes au même slug sont égaux (`Zoé Tanguy` = `zoe tanguy`).
-- **`Performance`** (classe abstraite) : ce qui est commun à toutes les
-  performances (horaires, `end`, `festival_day` — une journée finit à 06:00,
-  l'ordre du programme, la vue JSON). Ses méthodes abstraites —
-  `artist_slugs()`, `role_of()`, `summary()`, `kind_fields()` — obligent
-  chaque type à dire ce qui lui est propre.
-- **`SoloShow`, `Lineup`, `Workshop`** héritent de `Performance` et
-  appellent `super().__init__()`. Chacune vérifie ses propres règles à la
-  construction (âge 0-18 ; au moins deux numéros, sans doublon, animateur
-  hors des numéros, durée minimale ; au moins une place). Grâce au
-  polymorphisme, le reste du code n'écrit jamais `if kind == ...` : la table
-  `PERFORMANCE_CLASSES` et `performance_from_data()` choisissent la classe,
-  puis on appelle simplement `performance.summary()`,
-  `performance.artist_slugs()`…
-- **`Festival`** garde ses collections privées (`_venues`, `_artists`,
-  `_performances`). On les lit par des propriétés qui renvoient une **copie**,
-  et on les change seulement par des méthodes qui vérifient les règles :
-  `add_artist`, `add_performance`, `replace_performance`,
-  `cancel_performance`, `register_participant`. De même, les numéros d'un
-  plateau et les participants d'un atelier ne changent pas de l'extérieur.
-- **`Storage`** (interface abstraite `load()` / `save()`) : le festival ne
-  sait pas où il est stocké. `JSONStorage` lit et écrit le fichier,
-  `MemoryStorage` garde les données en mémoire pour les tests.
+- **Héritage et polymorphisme** : `SoloShow`, `Lineup` et `Workshop`
+  héritent de la classe abstraite `Performance` ; le code n'écrit jamais
+  `if kind == ...`.
+- **Encapsulation** : `Festival` garde ses listes privées et ne les change
+  que par des méthodes qui vérifient les règles.
+- **Ses propres erreurs** : le type de l'erreur donne le code HTTP (404, 409,
+  422, 500), le message dit quelle règle.
+- **Un stockage remplaçable** : le festival ne sait pas s'il vit dans un
+  fichier JSON ou en mémoire ; une base de données serait une classe de plus.
 
-### Où vivent les règles
+Le détail, avec des schémas, est dans [docs/architecture.md](docs/architecture.md).
 
-Dans les objets, jamais dans les routes ni dans la ligne de commande :
+## Documentation complète
 
-| Règle                                                        | Où                                   |
-| ------------------------------------------------------------ | ------------------------------------ |
-| durée de 1 à 360 minutes, titre non vide                     | `Performance.__init__`               |
-| règles propres à un solo, un plateau, un atelier             | `__init__` de chaque sous-classe     |
-| lieu et artistes connus, jour du festival, 30 min d'écart entre deux performances d'un même lieu ou d'un même artiste, pas deux fois le même id | `Festival.validate_performance` |
-| un déplacement refusé ne change rien                         | `Festival.replace_performance`       |
-| inscription : pas deux fois le même nom, pas au-delà des places, seulement un atelier | `Workshop.register` (et `Performance.register`, qui refuse) |
-| un artiste n'existe qu'une fois                              | `Festival.add_artist`                |
+| Document | Pour qui, pour quoi |
+| --- | --- |
+| [Guide d'utilisation](docs/guide-utilisation.md) | utiliser le site, l'admin et la ligne de commande, pas à pas |
+| [Architecture](docs/architecture.md) | les modules, les classes, où vivent les règles, une route de l'URL à la règle |
+| [Interface](docs/interface.md) | le site et l'admin : fichiers, design, appels à l'API |
+| [Développement](docs/developpement.md) | tests, outils, et comment ajouter une fonctionnalité |
+| [API.md](API.md) | le contrat de l'API, route par route |
 
-L'API et la ligne de commande construisent les objets et appellent ces
-méthodes : elles ne peuvent pas contourner les règles.
+## État du projet
 
-### Comment une erreur dit quelle règle
-
-Toutes les erreurs du festival héritent de `FestivalError`. Le **type** dit
-ce qui ne va pas, le **message** dit quelle règle, en une phrase :
-
-| Exception                 | Sens                     | HTTP |
-| ------------------------- | ------------------------ | ---- |
-| `FestivalNotFoundError`   | lieu, artiste, performance inconnu | 404 |
-| `FestivalConflictError`   | lieu ou artiste occupé, hors festival, atelier complet, déjà existant | 409 |
-| `FestivalValidationError` | valeur invalide          | 422  |
-| `FestivalStorageError`    | fichier illisible ou impossible à écrire | 500 |
-
-Dans l'API, un seul gestionnaire (`@app.exception_handler(FestivalError)`)
-traduit le type en code HTTP : les routes n'écrivent jamais `try`. La ligne
-de commande attrape toute la famille avec `except FestivalError` et affiche
-le message. Un corps ou un paramètre de mauvaise forme est refusé avant
-par FastAPI et pydantic (422, avec une liste de problèmes).
-
-### Une route, de l'URL à la règle
-
-`POST /api/performances` avec un solo de Nora Lebrun au Kiosque à 11:30,
-alors qu'elle y joue déjà à 11:00 :
-
-1. FastAPI vérifie la forme du corps avec `PerformanceBody` (pydantic).
-2. `create_performance` charge le festival depuis le stockage.
-3. `performance_from_data()` choisit `SoloShow` dans `PERFORMANCE_CLASSES`
-   et la construit : l'id `le-kiosque-2027-06-13-1130` est calculé.
-4. `Festival.add_performance` → `validate_performance` trouve un
-   chevauchement au même lieu et lève `FestivalConflictError("Le Kiosque is
-   already booked for …")`.
-5. Le gestionnaire d'erreurs répond `409 {"detail": "Le Kiosque is already
-   booked for …"}`. Rien n'a été enregistré.
-
-### Avec une base de données
-
-Il suffirait d'écrire une nouvelle classe, par exemple `SQLiteStorage(Storage)`,
-avec ses propres `load()` et `save()`, et de la choisir dans `cli.py` (une
-option `--db`). `create_app(storage)` la reçoit comme les autres : aucune
-classe du festival ni aucune route ne change. Pour une vraie base, on
-voudrait ensuite ne pas tout recharger et tout réécrire à chaque requête,
-mais lire et modifier une seule ligne : l'interface `Storage` grandirait
-(`add_performance`, `delete_performance`…).
-
-## Ce qui est fait, ce qui ne l'est pas
-
-Fait (étapes 00 à 13) :
+Fait (étapes 00 à 13 du cours, plus le design) :
 
 - toutes les commandes de la ligne de commande, avec `--data` et `--port` ;
 - tout `API.md` : lecture, écriture (admin), erreurs ;
-- le site et l'admin servis par le même serveur ;
-- 75 tests (règles et API), `ruff` propre, annotations et docstrings,
-  `uv build`.
+- le site public (programme filtrable, artistes, lieux, « Live now ») et
+  l'admin, sur ordinateur et téléphone ;
+- 75 tests, `ruff` propre, annotations et docstrings, `uv build`, et un
+  clone neuf qui marche.
 
 Pas fait :
 
 - l'extension SQLite ;
 - `deauville add` n'ajoute que des solos (plateaux et ateliers passent par
-  l'admin).
+  l'admin) ;
+- les photos : le site affiche des emplacements gris, remplacés
+  automatiquement par la photo d'un artiste dès que son `photo_url` est
+  renseigné. Les lieux et l'image d'ouverture n'ont pas encore de photo.
 
 Limites connues :
 
@@ -186,6 +172,8 @@ Limites connues :
   (`uv sync` installe le projet en mode éditable, donc tout marche depuis le
   dépôt). Installée ailleurs avec la wheel, la commande a besoin de
   `--data`, et le site ne serait pas trouvé.
-- Chaque requête recharge et réécrit tout le fichier, sans verrou : deux
+- Chaque requête recharge et réécrit tout le fichier, sans verrou : de deux
   écritures exactement simultanées, la dernière gagne.
 - `/api/now` sans `?at=` utilise l'heure de la machine, sans fuseau horaire.
+- La police (Instrument Sans) vient de Google Fonts : hors ligne, le site
+  utilise une police système proche.
