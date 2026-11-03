@@ -9,13 +9,13 @@
       href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <header class="wrap site-header">
-      <a class="brand" href="/">
-        <svg class="mark" viewBox="0 0 32 40" aria-hidden="true">
+      <a class="brand" href="index.html">
+        <svg class="mark" width="26" height="33" viewBox="0 0 32 40" aria-hidden="true">
           <path d="M16 16H3a13 13 0 0 1 6.5-11.26z" fill="#e8643c" />
           <path d="M16 16L9.5 4.74a13 13 0 0 1 13 0z" fill="currentColor" />
           <path d="M16 16l6.5-11.26A13 13 0 0 1 29 16z" fill="#e8643c" />
@@ -25,16 +25,16 @@
         <span class="brand-name"><strong>Festival du Rire</strong><span>Deauville 2027</span></span>
       </a>
       <nav class="nav" aria-label="Main">
-        <a href="/#programme">Programme</a>
-        <a href="/#artists" aria-current="page">Artists</a>
-        <a href="/#venues">Venues</a>
-        <a class="button" href="/#programme">See the programme</a>
+        <a href="index.html#programme">Programme</a>
+        <a href="index.html#artists" aria-current="page">Artists</a>
+        <a href="index.html#venues">Venues</a>
+        <a class="button" href="index.html#programme">See the programme</a>
       </nav>
     </header>
 
     <main class="wrap">
       <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href="/#artists">Artists</a> <span aria-hidden="true">/</span>
+        <a href="index.html#artists">Artists</a> <span aria-hidden="true">/</span>
         <span aria-current="page" id="crumb"></span>
       </nav>
 
@@ -52,7 +52,7 @@
       <section class="section" aria-labelledby="with-title" id="with-section">
         <div class="section-head">
           <h2 class="section-title" id="with-title">On stage together</h2>
-          <a href="/#artists">All artists</a>
+          <a href="index.html#artists">All artists</a>
         </div>
         <div class="grid" id="with-grid"></div>
       </section>
@@ -61,11 +61,11 @@
     <footer class="wrap site-footer">
       <div class="footer-line">
         <span>Festival du Rire · Deauville</span>
-        <span><a href="/admin/">Organisers</a> · <a href="/docs">API</a></span>
+        <span><a href="../admin/index.html">Organisers</a> · <a href="/docs">API</a></span>
       </div>
     </footer>
 
-    <script src="/app.js"></script>
+    <script src="app.js"></script>
     <script>
       showArtistPage();
     </script>

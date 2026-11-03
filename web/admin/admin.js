@@ -363,7 +363,11 @@ async function start() {
     await loadChoices();
     await loadSchedule();
   } catch (error) {
-    showMessage(`The API does not answer: ${error.message}`, "error");
+    showMessage(
+      "The festival server does not answer. In the project folder, run " +
+        "`uv run deauville serve`, then open http://127.0.0.1:8000/admin/",
+      "error",
+    );
   }
 }
 

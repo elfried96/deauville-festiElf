@@ -63,6 +63,13 @@ Puis ouvrir :
 | <http://127.0.0.1:8000/admin/> | l'admin |
 | <http://127.0.0.1:8000/docs> | la documentation interactive de l'API |
 
+> **Toujours passer par `uv run deauville serve`.** Ouvrir `index.html`
+> directement (double-clic, ou le bouton « ouvrir dans le navigateur » de
+> PyCharm ou VS Code) ne lance pas l'API : la page s'affiche sans programme ni
+> artistes, avec un bandeau qui rappelle la bonne commande. Si la page paraît
+> différente des captures après une mise à jour, rechargez-la sans le cache :
+> `Ctrl+Shift+R` (ou `Cmd+Shift+R` sur Mac).
+
 L'admin écrit dans `data/festival.json`. Pour essayer sans toucher aux
 vraies données :
 

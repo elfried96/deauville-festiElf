@@ -1,13 +1,43 @@
 // Public website of the festival. Every piece of data comes from the API
 // (see API.md). No framework: plain functions that fetch JSON and build HTML.
 
+// Raised when the page was not opened through the festival server
+// (a file opened directly, or another server): there is no API to ask.
+class ServerMissing extends Error {}
+
 async function getJson(url) {
-  const response = await fetch(url);
+  let response;
+  try {
+    response = await fetch(url);
+  } catch {
+    throw new ServerMissing();
+  }
+  if (!(response.headers.get("content-type") || "").includes("application/json")) {
+    throw new ServerMissing();
+  }
   const data = await response.json();
   if (!response.ok) {
     throw new Error(data.detail || `Error ${response.status}`);
   }
   return data;
+}
+
+// A banner that says how to open the site properly. Its styles are inline,
+// so it is readable even when style.css could not be loaded.
+function showServerHelp(error) {
+  if (!(error instanceof ServerMissing)) {
+    throw error;
+  }
+  const banner = document.createElement("div");
+  banner.setAttribute("role", "alert");
+  banner.style.cssText =
+    "position:sticky;top:0;z-index:10;padding:16px 24px;background:#111;color:#fff;" +
+    "font:16px/1.5 system-ui,sans-serif";
+  banner.innerHTML = `<strong>The festival data could not be loaded.</strong>
+    This page must be opened through the festival server. In the project folder, run
+    <code style="background:#333;padding:2px 6px;border-radius:4px">uv run deauville serve</code>
+    then open <a style="color:#9db4ff" href="http://127.0.0.1:8000/">http://127.0.0.1:8000/</a>.`;
+  document.body.prepend(banner);
 }
 
 function escapeHtml(text) {
@@ -193,7 +223,7 @@ function photoHtml(name, photoUrl) {
 const KIND_LABELS = { solo: "Solo", lineup: "Lineup", workshop: "Workshop" };
 
 function artistLink(artist) {
-  return `<a href="/artist.html?slug=${artist.slug}">${escapeHtml(artist.name)}</a>`;
+  return `<a href="artist.html?slug=${artist.slug}">${escapeHtml(artist.name)}</a>`;
 }
 
 function listOf(artists) {
@@ -405,7 +435,7 @@ function showArtists(artists) {
   document.getElementById("artist-grid").innerHTML = artists
     .map(
       (artist) => `
-      <a class="tile" href="/artist.html?slug=${artist.slug}">
+      <a class="tile" href="artist.html?slug=${artist.slug}">
         ${photoHtml(artist.name, artist.photo_url)}
         <span class="tile-head"><span class="tile-name">${escapeHtml(artist.name)}</span></span>
         <span class="tile-text">${escapeHtml(artist.bio)}</span>
@@ -416,10 +446,10 @@ function showArtists(artists) {
 
 // Photos of the venues (Wikimedia Commons, credited in the footer).
 const VENUE_PHOTOS = {
-  "grand-casino": "/images/casino.jpg",
-  "theatre-des-planches": "/images/theatre.jpg",
-  "le-kiosque": "/images/beach-cabins.jpg",
-  "la-cabane": "/images/parasols-folded.jpg",
+  "grand-casino": "images/casino.jpg",
+  "theatre-des-planches": "images/theatre.jpg",
+  "le-kiosque": "images/beach-cabins.jpg",
+  "la-cabane": "images/parasols-folded.jpg",
 };
 
 function showVenues(venues) {
@@ -515,13 +545,17 @@ async function showArtistPage() {
       .slice(0, 4)
       .map(
         (other) => `
-        <a class="tile" href="/artist.html?slug=${other.slug}">
+        <a class="tile" href="artist.html?slug=${other.slug}">
           ${photoHtml(other.name, photos[other.slug])}
           <span class="tile-head"><span class="tile-name">${escapeHtml(other.name)}</span></span>
         </a>`,
       )
       .join("");
   } catch (error) {
+    if (error instanceof ServerMissing) {
+      showServerHelp(error);
+      return;
+    }
     document.getElementById("artist-name").textContent = "Artist not found";
     document.getElementById("bio").textContent = error.message;
     document.getElementById("with-section").hidden = true;

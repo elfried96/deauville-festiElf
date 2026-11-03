@@ -13,27 +13,27 @@
       href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
       rel="stylesheet"
     />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <section class="cover" aria-label="Festival du Rire">
       <div class="cover-photos">
         <img
-          src="/images/stage.jpg"
+          src="images/stage.jpg"
           alt="A comedy stage, a microphone in a pool of blue light"
         />
         <figure>
           <img
-            src="/images/parasols.jpg"
+            src="images/parasols.jpg"
             alt="The closed parasols of Deauville beach under a blue sky"
           />
           <figcaption>Deauville, Normandy</figcaption>
         </figure>
       </div>
       <header class="wrap site-header on-photo">
-        <a class="brand" href="/">
-          <svg class="mark" viewBox="0 0 32 40" aria-hidden="true">
+        <a class="brand" href="index.html">
+          <svg class="mark" width="26" height="33" viewBox="0 0 32 40" aria-hidden="true">
           <path d="M16 16H3a13 13 0 0 1 6.5-11.26z" fill="#e8643c" />
           <path d="M16 16L9.5 4.74a13 13 0 0 1 13 0z" fill="currentColor" />
           <path d="M16 16l6.5-11.26A13 13 0 0 1 29 16z" fill="#e8643c" />
@@ -109,7 +109,7 @@
       <section class="wrap section story" id="story" aria-labelledby="story-title">
         <figure class="story-picture">
           <img
-            src="/images/boudin-concert.jpg"
+            src="images/boudin-concert.jpg"
             alt="Eugène Boudin's painting of an open-air concert at the Deauville casino in 1865"
           />
           <figcaption>Eugène Boudin, <em>Concert at the Casino of Deauville</em>, 1865</figcaption>
@@ -129,7 +129,7 @@
           </p>
           <img
             class="story-detail"
-            src="/images/stage.jpg"
+            src="images/stage.jpg"
             alt="An empty comedy stage, a microphone in a pool of blue light"
           />
         </div>
@@ -154,14 +154,14 @@
     <footer class="site-footer">
       <div class="footer-photo">
         <img
-          src="/images/planches-beach.jpg"
+          src="images/planches-beach.jpg"
           alt="Les Planches, the wooden boardwalk of Deauville, along an empty beach"
         />
         <p class="wrap big">See you on the boardwalk.</p>
       </div>
       <div class="wrap footer-line">
         <span>Festival du Rire · Deauville · <span id="footer-dates"></span></span>
-        <span><a href="/admin/">Organisers</a> · <a href="/docs">API</a></span>
+        <span><a href="../admin/index.html">Organisers</a> · <a href="/docs">API</a></span>
       </div>
       <details class="wrap credits">
         <summary>Photo credits</summary>
@@ -179,9 +179,9 @@
       </details>
     </footer>
 
-    <script src="/app.js"></script>
+    <script src="app.js"></script>
     <script>
-      showHomePage();
+      showHomePage().catch(showServerHelp);
     </script>
   </body>
 </html>
