@@ -170,6 +170,12 @@ def test_website_and_admin_are_served(client):
     assert client.get("/admin/").status_code == 200
 
 
+def test_browsers_always_get_the_latest_style(client):
+    response = client.get("/style.css")
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "no-cache"
+
+
 def test_cli_uses_the_data_option(tmp_path, capsys):
     data_file = tmp_path / "festival.json"
     JSONStorage(data_file).save(DATA)

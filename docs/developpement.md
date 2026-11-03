@@ -37,7 +37,7 @@ réinstaller.
 ## Les outils
 
 ```bash
-uv run pytest              # les 75 tests
+uv run pytest              # les 76 tests
 uv run ruff check .        # le style (imports, noms, erreurs probables)
 uv run ruff format .       # la mise en forme automatique
 uv build                   # dist/deauville-0.1.0-py3-none-any.whl
@@ -55,7 +55,7 @@ uv run uvicorn deauville.api:app --reload
 | Fichier | Tests | Ce qu'il vérifie |
 | --- | --- | --- |
 | `tests/test_festival.py` | 20 | les règles, directement sur les objets (`Festival`, `SoloShow`, `Lineup`, `Workshop`) |
-| `tests/test_api.py` | 30 | tout API.md par HTTP : chaque route, chaque filtre, chaque code d'erreur, le fichier de données |
+| `tests/test_api.py` | 31 | tout API.md par HTTP : chaque route, chaque filtre, chaque code d’erreur, le fichier de données, le cache du site |
 | `tests/test_side.py`, `B3/side/`, `B5/side/` | 25 | les exemples du cours |
 
 ### Aucun test ne touche `data/festival.json`

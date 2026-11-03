@@ -98,7 +98,7 @@ que `data/festival.json`.
 Les outils du projet :
 
 ```bash
-uv run pytest -v          # 75 tests ; aucun ne touche data/festival.json
+uv run pytest -v          # 76 tests ; aucun ne touche data/festival.json
 uv run ruff check .       # le style
 uv run ruff format .      # la mise en forme
 uv build                  # dist/deauville-0.1.0-py3-none-any.whl
@@ -163,7 +163,7 @@ Fait (étapes 00 à 13 du cours, plus le design) :
 - le site public (ouverture en photos, chiffres clés, programme filtrable,
   histoire, artistes en portraits dessinés, lieux, « Live now ») et l'admin,
   sur ordinateur et téléphone, avec un logo ;
-- 75 tests, `ruff` propre, annotations et docstrings, `uv build`, et un
+- 76 tests, `ruff` propre, annotations et docstrings, `uv build`, et un
   clone neuf qui marche.
 
 Pas fait :

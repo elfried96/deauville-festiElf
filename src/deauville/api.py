@@ -6,6 +6,7 @@ from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from starlette.types import Scope
 
 from .errors import (
     FestivalConflictError,
@@ -25,6 +26,19 @@ STATUS_CODES = {
     FestivalConflictError: 409,
     FestivalValidationError: 422,
 }
+
+
+class FreshStaticFiles(StaticFiles):
+    """Les fichiers du site, que le navigateur revérifie à chaque visite.
+
+    Sans cela, un navigateur peut garder un ancien style.css en cache et
+    afficher le nouveau HTML avec l'ancien style.
+    """
+
+    async def get_response(self, path: str, scope: Scope) -> Response:
+        response = await super().get_response(path, scope)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
 
 
 class ArtistBody(BaseModel):
@@ -175,12 +189,12 @@ def create_app(storage: Storage) -> FastAPI:
 
     app.mount(
         "/admin",
-        StaticFiles(directory=WEB_DIR / "admin", html=True),
+        FreshStaticFiles(directory=WEB_DIR / "admin", html=True),
         name="admin",
     )
     app.mount(
         "/",
-        StaticFiles(directory=WEB_DIR / "public", html=True),
+        FreshStaticFiles(directory=WEB_DIR / "public", html=True),
         name="website",
     )
 
